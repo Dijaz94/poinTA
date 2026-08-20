@@ -1,3 +1,5 @@
+import type { H3Event } from 'h3'
+
 export function getTa(event: H3Event) {
   return event.context.pointaUser ?? null
 }
@@ -6,6 +8,9 @@ export function assertTa(event: H3Event) {
   const ta = getTa(event)
   if (!ta) {
     throw createError({ statusCode: 401, statusMessage: 'No autorizado: debes iniciar sesión.' })
+  }
+  if (ta.isActive === false) {
+    throw createError({ statusCode: 403, statusMessage: 'Tu cuenta ha sido desactivada. Contacta a un administrador.' })
   }
   return ta
 }
@@ -19,10 +24,7 @@ export function assertAdmin(event: H3Event) {
 }
 
 export async function assertTaCanModify(event: H3Event, subjectId: string) {
-  const ta = getTa(event)
-  if (!ta) {
-    throw createError({ statusCode: 401, statusMessage: 'No autorizado: debes iniciar sesión.' })
-  }
+  const ta = assertTa(event)
 
   if (ta.role === 'ADMIN') {
     const subject = await prisma.subject.findUnique({ where: { id: subjectId } })

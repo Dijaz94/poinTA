@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Session } from '~/types/sessions'
 import { useSortable } from '@vueuse/integrations'
 
 const route = useRoute()
@@ -6,7 +7,7 @@ const subjectId = computed(() => route.params.subjectId as string)
 const toast = useToast()
 
 // ─── Datos ───
-const { data: sessions, status, error, refresh } = await useFetch('/api/schedule', {
+const { data: sessions, status, error, refresh } = await useFetch<Session[]>('/api/schedule', {
   query: { subjectId },
 })
 
@@ -17,7 +18,7 @@ const columns = ref<Record<string, Session[]>>({
 })
 
 const extraordinarySessions = computed(() =>
-  (sessions.value ?? []).filter((s: any) => !s.isRecurring),
+  (sessions.value ?? []).filter((s) => !s.isRecurring),
 )
 
 function rebuildColumns() {
@@ -119,7 +120,7 @@ function openNew() {
   isOpen.value = true
 }
 
-function openEdit(s: any) {
+function openEdit(s: Session) {
   form.id = s.id
   form.title = s.title
   form.isRecurring = s.isRecurring
@@ -218,7 +219,7 @@ async function removeSession(id: string) {
       <template #description>
         <div class="flex items-center justify-between gap-4">
           <span>Ocurrió un error al consultar la plataforma.</span>
-          <UButton color="neutral" variant="soft" size="sm" @click="refresh">Reintentar</UButton>
+          <UButton color="neutral" variant="soft" size="sm" @click="() => refresh()">Reintentar</UButton>
         </div>
       </template>
     </UAlert>
@@ -251,7 +252,7 @@ async function removeSession(id: string) {
               v-for="session in columns[d.value]"
               :key="session.id"
               :data-id="session.id"
-              :ui="{ base: 'cursor-grab active:cursor-grabbing border-t-2 border-t-primary shadow-sm text-sm', body: 'p-3 space-y-1.5' }"
+              :ui="{ root: 'cursor-grab active:cursor-grabbing border-t-2 border-t-primary shadow-sm text-sm', body: 'p-3 space-y-1.5' }"
             >
               <div class="flex items-center justify-between gap-2">
                 <span class="font-semibold text-default line-clamp-1">{{ session.title }}</span>
@@ -314,7 +315,7 @@ async function removeSession(id: string) {
           <UCard
             v-for="session in extraordinarySessions"
             :key="session.id"
-            :ui="{ base: 'border-l-4 border-l-warning' }"
+            :ui="{ root: 'border-l-4 border-l-warning' }"
           >
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>

@@ -1,23 +1,25 @@
 <script setup lang="ts">
+import type { Session } from '~/types/sessions'
+
 const route = useRoute()
 const subjectId = computed(() => route.params.subjectId as string)
 
-const { data: sessions, status, error, refresh } = await useFetch('/api/schedule', {
+const { data: sessions, status, error, refresh } = await useFetch<Session[]>('/api/schedule', {
   query: { subjectId },
 })
 
 const recurringSessions = computed(() => {
-  return sessions.value?.filter((s: any) => s.isRecurring) || []
+  return sessions.value?.filter((s) => s.isRecurring) || []
 })
 
 const extraordinarySessions = computed(() => {
-  return sessions.value?.filter((s: any) => !s.isRecurring) || []
+  return sessions.value?.filter((s) => !s.isRecurring) || []
 })
 
 const sortedRecurringSessions = computed(() => {
   return [...recurringSessions.value].sort((a, b) => {
-    const dayA = DAY_ORDERS[a.dayOfWeek] ?? 99
-    const dayB = DAY_ORDERS[b.dayOfWeek] ?? 99
+    const dayA = DAY_ORDERS[a.dayOfWeek!] ?? 99
+    const dayB = DAY_ORDERS[b.dayOfWeek!] ?? 99
     if (dayA !== dayB) return dayA - dayB
     return a.startTime.localeCompare(b.startTime)
   })
@@ -36,7 +38,7 @@ const sortedRecurringSessions = computed(() => {
       <template #description>
         <div class="flex items-center justify-between gap-4">
           <span>Ocurrió un error al consultar la plataforma.</span>
-          <UButton color="neutral" variant="soft" size="sm" @click="refresh">Reintentar</UButton>
+          <UButton color="neutral" variant="soft" size="sm" @click="() => refresh()">Reintentar</UButton>
         </div>
       </template>
     </UAlert>
@@ -61,7 +63,7 @@ const sortedRecurringSessions = computed(() => {
           <UCard
             v-for="session in sortedRecurringSessions"
             :key="session.id"
-            :ui="{ base: 'border-t-4 border-t-primary shadow-sm' }"
+            :ui="{ root: 'border-t-4 border-t-primary shadow-sm' }"
           >
             <div class="flex items-center justify-between mb-4">
               <span class="font-bold text-lg text-primary">{{ dayLabel(session.dayOfWeek) }}</span>
@@ -97,7 +99,7 @@ const sortedRecurringSessions = computed(() => {
           <UCard
             v-for="session in extraordinarySessions"
             :key="session.id"
-            :ui="{ base: 'border-l-4 border-l-warning' }"
+            :ui="{ root: 'border-l-4 border-l-warning' }"
           >
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>

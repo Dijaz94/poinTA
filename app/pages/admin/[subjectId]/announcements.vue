@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import type { Announcement } from '~/types/announcements'
+
 const route = useRoute()
 const subjectId = computed(() => route.params.subjectId as string)
 const toast = useToast()
 
-const { data: announcements, status, error, refresh } = await useFetch('/api/announcements', {
+const { data: announcements, status, error, refresh } = await useFetch<Announcement[]>('/api/announcements', {
   query: { subjectId },
 })
 
@@ -108,7 +110,7 @@ const remove = async (id: string) => {
         <UCard
           v-for="announcement in announcements"
           :key="announcement.id"
-          :ui="{ base: 'border-l-4 border-l-primary' }"
+          :ui="{ root: 'border-l-4 border-l-primary' }"
         >
           <div class="flex items-start justify-between gap-4">
             <div class="min-w-0">

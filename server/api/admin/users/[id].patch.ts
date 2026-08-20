@@ -1,14 +1,17 @@
+import { serverSupabaseServiceRole } from '#supabase/server'
+
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
   if (!id) {
     throw createError({ statusCode: 400, statusMessage: 'ID de usuario requerido.' })
   }
 
-  assertAdmin(event)
+  const currentAdmin = assertAdmin(event)
 
   const body = await readBody(event)
-  const { role, addSubjectIds, removeSubjectIds } = body as {
+  const { role, isActive, addSubjectIds, removeSubjectIds } = body as {
     role?: 'ADMIN' | 'TA'
+    isActive?: boolean
     addSubjectIds?: string[]
     removeSubjectIds?: string[]
   }
@@ -18,10 +21,31 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Usuario no encontrado.' })
   }
 
+  // Prevent self-deactivation or self-demotion
+  if (currentAdmin.id === id) {
+    if (isActive === false) {
+      throw createError({ statusCode: 400, statusMessage: 'No puedes desactivar tu propia cuenta de administrador.' })
+    }
+    if (role && role !== 'ADMIN') {
+      throw createError({ statusCode: 400, statusMessage: 'No puedes quitarte el rol de administrador a ti mismo.' })
+    }
+  }
+
   const updates: any = {}
 
   if (role) {
     updates.role = role
+  }
+
+  if (typeof isActive === 'boolean') {
+    updates.isActive = isActive
+
+    const admin = serverSupabaseServiceRole(event)
+    const ban_duration = isActive ? 'none' : '876000h'
+    const { error: banError } = await admin.auth.admin.updateUserById(id, { ban_duration })
+    if (banError) {
+      throw createError({ statusCode: 400, statusMessage: `Error al sincronizar estado en Supabase: ${banError.message}` })
+    }
   }
 
   if (addSubjectIds?.length) {
@@ -39,5 +63,12 @@ export default defineEventHandler(async (event) => {
     include: { subjects: { select: { id: true, name: true } } },
   })
 
-  return { id: updated!.id, email: updated!.email, name: updated!.name, role: updated!.role, subjects: updated!.subjects }
+  return {
+    id: updated!.id,
+    email: updated!.email,
+    name: updated!.name,
+    role: updated!.role,
+    isActive: updated!.isActive,
+    subjects: updated!.subjects,
+  }
 })

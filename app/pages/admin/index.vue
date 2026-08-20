@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import type { Me, User } from '~/types/users'
+import type { Subject } from '~/types/subjects'
+
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
-const { data: me } = await useFetch('/api/auth/me')
+const { data: me } = await useFetch<Me>('/api/auth/me')
 const isAdmin = computed(() => me.value?.role === 'ADMIN')
 
-const { data: subjects, status, error, refresh } = await useFetch('/api/subjects', {
+const { data: subjects, status, error, refresh } = await useFetch<Subject[]>('/api/subjects', {
   query: { mine: 'true' },
 })
 
@@ -14,7 +17,7 @@ const form = reactive({ name: '', code: '', semester: '' })
 const creating = ref(false)
 const createError = ref('')
 
-const { data: allUsers } = await useFetch('/api/admin/users', {
+const { data: allUsers } = await useFetch<User[]>('/api/admin/users', {
   query: {},
   immediate: isAdmin.value,
 })
@@ -78,7 +81,7 @@ const handleCreate = async () => {
       <template #description>
         <div class="flex items-center justify-between gap-4">
           <span>Ocurrió un error al consultar la plataforma.</span>
-          <UButton color="neutral" variant="soft" size="sm" @click="refresh">Reintentar</UButton>
+          <UButton color="neutral" variant="soft" size="sm" @click="() => refresh()">Reintentar</UButton>
         </div>
       </template>
     </UAlert>
@@ -106,7 +109,7 @@ const handleCreate = async () => {
         v-for="subject in subjects"
         :key="subject.id"
         :ui="{
-          base: 'transition-all duration-200 hover:-translate-y-1 hover:shadow-xl border border-transparent hover:border-secondary/30',
+          root: 'transition-all duration-200 hover:-translate-y-1 hover:shadow-xl border border-transparent hover:border-secondary/30',
           body: 'flex flex-col h-full justify-between gap-4 p-6',
         }"
       >
@@ -159,7 +162,8 @@ const handleCreate = async () => {
             <label class="text-sm font-medium text-default">Ayudantes asignados</label>
             <USelectMenu
               v-model="selectedUserIds"
-              :items="allUsers.map((u: any) => ({ label: `${u.name} (${u.email})`, value: u.id }))"
+              :items="allUsers.map((u) => ({ label: `${u.name} (${u.email})`, value: u.id }))"
+              value-key="value"
               multiple
               placeholder="Seleccionar ayudantes (opcional)"
               class="w-full"

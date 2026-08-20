@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import type { Material } from '~/types/materials'
+
 const route = useRoute()
 const subjectId = computed(() => route.params.subjectId as string)
 const toast = useToast()
 
-const { data: materials, status, error, refresh } = await useFetch('/api/materials', {
+const { data: materials, status, error, refresh } = await useFetch<Material[]>('/api/materials', {
   query: { subjectId },
 })
 
@@ -106,7 +108,7 @@ const remove = async (id: string) => {
         <template #description>
           <div class="flex items-center justify-between gap-4">
             <span>Ocurrió un error al consultar la plataforma.</span>
-            <UButton color="neutral" variant="soft" size="sm" @click="refresh">Reintentar</UButton>
+            <UButton color="neutral" variant="soft" size="sm" @click="() => refresh()">Reintentar</UButton>
           </div>
         </template>
       </UAlert>
@@ -126,7 +128,7 @@ const remove = async (id: string) => {
         <UCard
           v-for="material in materials"
           :key="material.id"
-          :ui="{ base: 'flex flex-col h-full border border-muted', body: 'flex flex-col h-full gap-3' }"
+          :ui="{ root: 'flex flex-col h-full border border-muted', body: 'flex flex-col h-full gap-3' }"
         >
           <div class="flex-1">
             <div class="flex items-start gap-3 mb-2">

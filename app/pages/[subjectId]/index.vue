@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import type { Announcement } from '~/types/announcements'
+
 const route = useRoute()
 const subjectId = computed(() => route.params.subjectId as string)
 
-const { data: announcements, status, error, refresh } = await useFetch('/api/announcements', {
+const { data: announcements, status, error, refresh } = await useFetch<Announcement[]>('/api/announcements', {
   query: { subjectId },
 })
 </script>
@@ -24,7 +26,7 @@ const { data: announcements, status, error, refresh } = await useFetch('/api/ann
       <template #description>
         <div class="flex items-center justify-between gap-4">
           <span>Ocurrió un error al consultar la plataforma.</span>
-          <UButton color="neutral" variant="soft" size="sm" @click="refresh">Reintentar</UButton>
+          <UButton color="neutral" variant="soft" size="sm" @click="() => refresh()">Reintentar</UButton>
         </div>
       </template>
     </UAlert>
@@ -52,7 +54,7 @@ const { data: announcements, status, error, refresh } = await useFetch('/api/ann
         v-for="announcement in announcements"
         :key="announcement.id"
         :ui="{
-          base: 'overflow-hidden border-l-4 border-l-primary',
+          root: 'overflow-hidden border-l-4 border-l-primary',
           header: 'pb-2 bg-muted/10',
           body: 'pt-4',
         }"

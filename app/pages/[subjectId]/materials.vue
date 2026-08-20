@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import type { Material } from '~/types/materials'
+
 const route = useRoute()
 const subjectId = computed(() => route.params.subjectId as string)
 
-const { data: materials, status, error, refresh } = await useFetch('/api/materials', {
+const { data: materials, status, error, refresh } = await useFetch<Material[]>('/api/materials', {
   query: { subjectId },
 })
 </script>
@@ -24,7 +26,7 @@ const { data: materials, status, error, refresh } = await useFetch('/api/materia
       <template #description>
         <div class="flex items-center justify-between gap-4">
           <span>Ocurrió un error al consultar la plataforma.</span>
-          <UButton color="neutral" variant="soft" size="sm" @click="refresh">Reintentar</UButton>
+          <UButton color="neutral" variant="soft" size="sm" @click="() => refresh()">Reintentar</UButton>
         </div>
       </template>
     </UAlert>
@@ -46,7 +48,7 @@ const { data: materials, status, error, refresh } = await useFetch('/api/materia
         v-for="material in materials"
         :key="material.id"
         :ui="{
-          base: 'group flex flex-col h-full border border-muted hover:border-secondary transition-colors',
+          root: 'group flex flex-col h-full border border-muted hover:border-secondary transition-colors',
           body: 'flex flex-col h-full gap-4',
         }"
       >

@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import type { Me } from '~/types/users'
+
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
-const { data: me } = await useFetch('/api/auth/me')
+const { data: me } = await useFetch<Me>('/api/auth/me')
 
 const isAdmin = computed(() => me.value?.role === 'ADMIN')
 

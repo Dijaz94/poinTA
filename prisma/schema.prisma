@@ -27,6 +27,7 @@ model User {
   name     String
   email    String    @unique
   role     Role      @default(TA)
+  isActive Boolean   @default(true)
   subjects Subject[]
 }
 

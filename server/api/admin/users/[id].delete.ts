@@ -6,7 +6,10 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'ID de usuario requerido.' })
   }
 
-  assertAdmin(event)
+  const currentAdmin = assertAdmin(event)
+  if (currentAdmin.id === id) {
+    throw createError({ statusCode: 400, statusMessage: 'No puedes eliminar tu propia cuenta de administrador.' })
+  }
 
   const admin = serverSupabaseServiceRole(event)
   const { error } = await admin.auth.admin.deleteUser(id)

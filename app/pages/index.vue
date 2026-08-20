@@ -49,7 +49,7 @@ const { data: subjects, status, error, refresh } = await useFetch<Subject[]>('/a
         <template #description>
           <div class="flex items-center justify-between gap-4">
             <span>Ocurrió un error al consultar la plataforma.</span>
-            <UButton color="neutral" variant="soft" size="sm" @click="()=>refresh">Reintentar</UButton>
+            <UButton color="neutral" variant="soft" size="sm" @click="() => refresh()">Reintentar</UButton>
           </div>
         </template>
       </UAlert>
