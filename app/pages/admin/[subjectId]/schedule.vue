@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Session } from '~/types/sessions'
 import type { SessionForm } from '~/types/sessionForm'
+import ModalDeleteSchedule from '~/components/modalDeleteSchedule.vue'
 
 const route = useRoute()
 const subjectId = computed(() => route.params.subjectId as string)
@@ -171,11 +172,23 @@ async function saveSession() {
 }
 
 // ─── Eliminar sesión ───
+
+const overlay = useOverlay()
+const confirmDelete = overlay.create(ModalDeleteSchedule)
+
 const deletingId = ref('')
-async function removeSession(id: string) {
-  deletingId.value = id
+async function removeSession(session: Session) {
+  const instance = confirmDelete.open({
+    title: 'Eliminar sesión',
+    description: `¿Estás seguro de que deseas eliminar la sesión "${session.title}"?`
+  })
+
+  if (!(await instance.result)) return
+
+  deletingId.value = session.id
+
   try {
-    await $fetch(`/api/admin/schedule/${id}`, { method: 'DELETE' })
+    await $fetch(`/api/admin/schedule/${session.id}`, { method: 'DELETE' })
     toast.add({ title: 'Sesión eliminada.', color: 'success' })
     await refresh()
   } catch (e: any) {
@@ -248,7 +261,7 @@ async function removeSession(id: string) {
               :data-id="session.id"
               :ui="{ root: 'cursor-grab active:cursor-grabbing border-t-2 border-t-primary shadow-sm text-sm', body: 'p-3 space-y-1.5' }"
             >
-              <div class="flex items-center justify-between gap-2">
+              <div class="flex flex-col items-start justify-between gap-2">
                 <span class="font-semibold text-default line-clamp-1">{{ session.title }}</span>
                 <div class="flex gap-0.5 shrink-0">
                   <UButton
@@ -266,7 +279,7 @@ async function removeSession(id: string) {
                     size="xs"
                     :loading="deletingId === session.id"
                     aria-label="Eliminar"
-                    @click="removeSession(session.id)"
+                    @click="removeSession(session)"
                   />
                 </div>
               </div>
@@ -346,7 +359,7 @@ async function removeSession(id: string) {
                   size="sm"
                   :loading="deletingId === session.id"
                   aria-label="Eliminar"
-                  @click="removeSession(session.id)"
+                  @click="removeSession(session)"
                 />
               </div>
             </div>
