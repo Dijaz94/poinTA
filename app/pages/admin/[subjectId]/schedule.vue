@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { Session } from '~/types/sessions'
-import type { SessionForm } from '~/types/sessionForm'
 import ModalDeleteSchedule from '~/components/modalDeleteSchedule.vue'
+import SessionCard from '~/components/SessionCard.vue'
+import ModalSessionForm from '~/components/ModalSessionForm.vue'
 
 const route = useRoute()
 const subjectId = computed(() => route.params.subjectId as string)
@@ -70,7 +71,7 @@ async function updateDayOfWeek(id: string, day: string) {
   }
 }
 
-// Initialize Sortable dynamically using a custom directive to ensure it only runs when the DOM element is actually mounted on the client.
+// Initialize Sortable dynamically using a custom directive
 const vSortable = {
   async mounted(el: HTMLElement, binding: any) {
     const day = binding.value
@@ -83,96 +84,18 @@ const vSortable = {
   }
 }
 
-// ─── Modal: Crear / Editar sesión ───
-const isOpen = ref(false)
-const saving = ref(false)
-
-
-
-const form = reactive<SessionForm>({
-  id: null,
-  title: '',
-  isRecurring: true,
-  dayOfWeek: 'MONDAY',
-  date: '',
-  startTime: '14:00',
-  endTime: '15:30',
-  location: '',
-})
+// ─── Modal Formulario Sesión ───
+const sessionModalRef = ref<InstanceType<typeof ModalSessionForm> | null>(null)
 
 function openNew() {
-  form.id = null
-  form.title = ''
-  form.isRecurring = true
-  form.dayOfWeek = 'MONDAY'
-  form.date = ''
-  form.startTime = '14:00'
-  form.endTime = '15:30'
-  form.location = ''
-  isOpen.value = true
+  sessionModalRef.value?.openNew()
 }
 
 function openEdit(s: Session) {
-  form.id = s.id
-  form.title = s.title
-  form.isRecurring = s.isRecurring
-  form.dayOfWeek = s.dayOfWeek ?? 'MONDAY'
-  form.date = s.date ? (new Date(s.date).toISOString().split('T')[0] ?? '') : ''
-  form.startTime = s.startTime
-  form.endTime = s.endTime
-  form.location = s.location ?? ''
-  isOpen.value = true
-}
-
-async function saveSession() {
-  if (!form.title.trim()) {
-    toast.add({ title: 'El título es obligatorio.', color: 'warning' })
-    return
-  }
-  if (!form.startTime || !form.endTime) {
-    toast.add({ title: 'Completa las horas de inicio y término.', color: 'warning' })
-    return
-  }
-  if (!form.isRecurring && !form.date) {
-    toast.add({ title: 'Para sesiones extraordinarias, indica la fecha.', color: 'warning' })
-    return
-  }
-
-  saving.value = true
-  try {
-    if (form.id) {
-      await $fetch(`/api/admin/schedule/${form.id}`, {
-        method: 'PUT',
-        body: { ...form, date: form.date || null },
-      })
-      toast.add({ title: 'Sesión actualizada.', color: 'success' })
-    } else {
-      await $fetch('/api/admin/schedule', {
-        method: 'POST',
-        body: {
-          title: form.title,
-          isRecurring: form.isRecurring,
-          dayOfWeek: form.isRecurring ? form.dayOfWeek : null,
-          date: !form.isRecurring ? form.date : null,
-          startTime: form.startTime,
-          endTime: form.endTime,
-          location: form.location,
-          subjectId: subjectId.value,
-        },
-      })
-      toast.add({ title: 'Sesión creada.', color: 'success' })
-    }
-    isOpen.value = false
-    await refresh()
-  } catch (e: any) {
-    toast.add({ title: e?.data?.statusMessage ?? 'No se pudo guardar la sesión.', color: 'error' })
-  } finally {
-    saving.value = false
-  }
+  sessionModalRef.value?.openEdit(s)
 }
 
 // ─── Eliminar sesión ───
-
 const overlay = useOverlay()
 const confirmDelete = overlay.create(ModalDeleteSchedule)
 
@@ -255,43 +178,15 @@ async function removeSession(session: Session) {
               :data-day="d.value"
               class="flex-1 flex flex-col gap-2"
             >
-              <UCard
-              v-for="session in columns[d.value]"
-              :key="session.id"
-              :data-id="session.id"
-              :ui="{ root: 'cursor-grab active:cursor-grabbing border-t-2 border-t-primary shadow-sm text-sm', body: 'p-3 space-y-1.5' }"
-            >
-              <div class="flex flex-col items-start justify-between gap-2">
-                <span class="font-semibold text-default line-clamp-1">{{ session.title }}</span>
-                <div class="flex gap-0.5 shrink-0">
-                  <UButton
-                    color="neutral"
-                    variant="ghost"
-                    icon="i-heroicons-pencil-square"
-                    size="xs"
-                    aria-label="Editar"
-                    @click="openEdit(session)"
-                  />
-                  <UButton
-                    color="error"
-                    variant="ghost"
-                    icon="i-heroicons-trash"
-                    size="xs"
-                    :loading="deletingId === session.id"
-                    aria-label="Eliminar"
-                    @click="removeSession(session)"
-                  />
-                </div>
-              </div>
-              <div class="flex items-center gap-2 text-xs text-muted">
-                <UIcon name="i-heroicons-clock" class="size-3" />
-                {{ session.startTime }} – {{ session.endTime }}
-              </div>
-              <div v-if="session.location" class="flex items-center gap-2 text-xs text-muted">
-                <UIcon name="i-heroicons-map-pin" class="size-3" />
-                {{ session.location }}
-              </div>
-            </UCard>
+              <SessionCard
+                v-for="session in columns[d.value]"
+                :key="session.id"
+                :session="session"
+                :deleting="deletingId === session.id"
+                variant="kanban"
+                @edit="openEdit"
+                @delete="removeSession"
+              />
             </div>
           </div>
         </div>
@@ -320,107 +215,24 @@ async function removeSession(session: Session) {
         </div>
 
         <div v-else class="space-y-3">
-          <UCard
+          <SessionCard
             v-for="session in extraordinarySessions"
             :key="session.id"
-            :ui="{ root: 'border-l-4 border-l-warning' }"
-          >
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <h4 class="font-bold text-default">{{ session.title }}</h4>
-                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-sm text-muted">
-                  <span v-if="session.date" class="flex items-center gap-1.5">
-                    <UIcon name="i-heroicons-calendar-days" class="size-4" />
-                    {{ formatFullDate(session.date) }}
-                  </span>
-                  <span class="flex items-center gap-1.5">
-                    <UIcon name="i-heroicons-clock" class="size-4" />
-                    {{ session.startTime }} – {{ session.endTime }}
-                  </span>
-                  <span v-if="session.location" class="flex items-center gap-1.5">
-                    <UIcon name="i-heroicons-map-pin" class="size-4" />
-                    {{ session.location }}
-                  </span>
-                </div>
-              </div>
-              <div class="flex gap-1 shrink-0">
-                <UButton
-                  color="neutral"
-                  variant="ghost"
-                  icon="i-heroicons-pencil-square"
-                  size="sm"
-                  aria-label="Editar"
-                  @click="openEdit(session)"
-                />
-                <UButton
-                  color="error"
-                  variant="ghost"
-                  icon="i-heroicons-trash"
-                  size="sm"
-                  :loading="deletingId === session.id"
-                  aria-label="Eliminar"
-                  @click="removeSession(session)"
-                />
-              </div>
-            </div>
-          </UCard>
+            :session="session"
+            :deleting="deletingId === session.id"
+            variant="extraordinary"
+            @edit="openEdit"
+            @delete="removeSession"
+          />
         </div>
       </section>
     </template>
 
     <!-- Modal: Crear / Editar sesión -->
-    <UModal v-model:open="isOpen" :title="form.id ? 'Editar sesión' : 'Nueva sesión'" :ui="{ content: 'max-w-lg' }">
-      <template #body>
-        <form class="space-y-5 p-1" @submit.prevent="saveSession">
-          <UFormField label="Título" name="title">
-            <UInput v-model="form.title" placeholder="Ej: Ayudantía Sección 1" class="w-full" />
-          </UFormField>
-
-          <UFormField label="Tipo de sesión" name="isRecurring">
-            <div class="flex gap-4">
-              <URadioGroup v-model="form.isRecurring" :items="[
-                { label: 'Recurrente (semanal)', value: true },
-                { label: 'Extraordinaria (fecha puntual)', value: false },
-              ]" />
-            </div>
-          </UFormField>
-
-          <UFormField v-if="form.isRecurring" label="Día de la semana" name="dayOfWeek">
-            <USelect
-              v-model="form.dayOfWeek"
-              :items="DAYS.map(d => ({ label: d.label, value: d.value as string }))"
-              class="w-full"
-            />
-          </UFormField>
-
-          <UFormField v-else label="Fecha" name="date">
-            <UInput v-model="form.date" type="date" class="w-full" />
-          </UFormField>
-
-          <div class="grid grid-cols-2 gap-4">
-            <UFormField label="Hora inicio" name="startTime">
-              <UInput v-model="form.startTime" type="time" class="w-full" />
-            </UFormField>
-            <UFormField label="Hora término" name="endTime">
-              <UInput v-model="form.endTime" type="time" class="w-full" />
-            </UFormField>
-          </div>
-
-          <UFormField label="Ubicación (opcional)" name="location">
-            <UInput v-model="form.location" placeholder="Ej: Sala A-102" class="w-full" />
-          </UFormField>
-
-          <div class="flex justify-end gap-3 pt-2">
-            <UButton color="neutral" variant="ghost" label="Cancelar" @click="isOpen = false" />
-            <UButton
-              type="submit"
-              color="primary"
-              :label="form.id ? 'Guardar cambios' : 'Crear sesión'"
-              :loading="saving"
-            />
-          </div>
-        </form>
-      </template>
-    </UModal>
+    <ModalSessionForm
+      ref="sessionModalRef"
+      :subject-id="subjectId"
+      @saved="refresh"
+    />
   </div>
-</template>>
+</template>
