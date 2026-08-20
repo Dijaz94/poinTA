@@ -1,56 +1,112 @@
 <script setup lang="ts">
 import type { Material } from '~/types/materials'
+import ModalDeleteMaterial from '~/components/ModalDeleteMaterial.vue'
 
 const route = useRoute()
 const subjectId = computed(() => route.params.subjectId as string)
 const toast = useToast()
+const supabase = useSupabaseClient()
+const overlay = useOverlay()
+const confirmDelete = overlay.create(ModalDeleteMaterial)
 
 const { data: materials, status, error, refresh } = await useFetch<Material[]>('/api/materials', {
   query: { subjectId },
 })
 
+const mode = ref<'file' | 'url'>('file')
 const title = ref('')
 const description = ref('')
 const fileUrl = ref('')
-const submitting = ref(false)
+const selectedFile = ref<File | null>(null)
+const uploading = ref(false)
 const deletingId = ref('')
+const fileInputRef = ref<HTMLInputElement | null>(null)
 
-const submit = async () => {
-  if (!title.value.trim() || !fileUrl.value.trim()) {
-    toast.add({ title: 'Completa el título y el enlace del material.', color: 'warning' })
-    return
-  }
-
-  submitting.value = true
-  try {
-    await $fetch('/api/admin/materials', {
-      method: 'POST',
-      body: {
-        title: title.value.trim(),
-        description: description.value.trim() || null,
-        fileUrl: fileUrl.value.trim(),
-        subjectId: subjectId.value,
-      },
-    })
-    title.value = ''
-    description.value = ''
-    fileUrl.value = ''
-    toast.add({ title: 'Material agregado.', color: 'success' })
-    await refresh()
-  } catch (e: any) {
-    toast.add({
-      title: e?.data?.statusMessage ?? 'No se pudo agregar el material.',
-      color: 'error',
-    })
-  } finally {
-    submitting.value = false
+const onFileChange = (e: Event) => {
+  const target = e.target as HTMLInputElement
+  if (target.files && target.files[0]) {
+    const file = target.files[0]
+    selectedFile.value = file
+    if (!title.value.trim()) {
+      // Auto-completar título con el nombre del archivo sin la extensión
+      title.value = file.name.replace(/\.[^/.]+$/, '')
+    }
   }
 }
 
-const remove = async (id: string) => {
-  deletingId.value = id
+const clearSelectedFile = () => {
+  selectedFile.value = null
+  if (fileInputRef.value) {
+    fileInputRef.value.value = ''
+  }
+}
+
+const formatFileSize = (bytes: number) => {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
+const submit = async () => {
+  if (!title.value.trim()) {
+    toast.add({ title: 'Ingresa un título para el material.', color: 'warning' })
+    return
+  }
+
+  uploading.value = true
   try {
-    await $fetch(`/api/admin/materials/${id}`, { method: 'DELETE' })
+    const formData = new FormData()
+    formData.append('title', title.value.trim())
+    if (description.value.trim()) {
+      formData.append('description', description.value.trim())
+    }
+    formData.append('subjectId', subjectId.value)
+
+    if (mode.value === 'file' && selectedFile.value) {
+      formData.append('file', selectedFile.value)
+    } else if (mode.value === 'url' && fileUrl.value.trim()) {
+      formData.append('fileUrl', fileUrl.value.trim())
+    } else {
+      toast.add({ title: 'Debes seleccionar un archivo o ingresar una URL.', color: 'warning' })
+      uploading.value = false
+      return
+    }
+
+    await $fetch('/api/admin/materials', {
+      method: 'POST',
+      body: formData,
+    })
+
+    title.value = ''
+    description.value = ''
+    fileUrl.value = ''
+    clearSelectedFile()
+    toast.add({ title: 'Material agregado con éxito.', color: 'success' })
+    await refresh()
+  } catch (e: any) {
+    console.error('Error al guardar material:', e)
+    toast.add({
+      title: e?.data?.statusMessage ?? e?.message ?? 'No se pudo agregar el material.',
+      color: 'error',
+    })
+  } finally {
+    uploading.value = false
+  }
+}
+
+const remove = async (material: Material) => {
+  const instance = confirmDelete.open({
+    title: 'Eliminar material',
+    description: `¿Estás seguro de que deseas eliminar "${material.title}"? Esta acción no se puede deshacer.`,
+  })
+
+  if (!(await instance.result)) return
+
+  deletingId.value = material.id
+  try {
+    await $fetch(`/api/admin/materials/${material.id}`, { method: 'DELETE' })
     toast.add({ title: 'Material eliminado.', color: 'success' })
     await refresh()
   } catch (e: any) {
@@ -69,29 +125,109 @@ const remove = async (id: string) => {
     <!-- Subir material -->
     <UCard>
       <template #header>
-        <h2 class="text-lg font-bold text-highlighted">Agregar material</h2>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h2 class="text-lg font-bold text-highlighted">Agregar material</h2>
+          <!-- Selector de Modo: Archivo o URL -->
+          <div class="flex items-center gap-2 bg-muted/40 p-1 rounded-lg border border-muted/50">
+            <UButton
+              size="xs"
+              :variant="mode === 'file' ? 'solid' : 'ghost'"
+              :color="mode === 'file' ? 'primary' : 'neutral'"
+              icon="i-heroicons-paper-clip"
+              label="Subir Archivo"
+              @click="mode = 'file'"
+            />
+            <UButton
+              size="xs"
+              :variant="mode === 'url' ? 'solid' : 'ghost'"
+              :color="mode === 'url' ? 'primary' : 'neutral'"
+              icon="i-heroicons-link"
+              label="Enlace Externo"
+              @click="mode = 'url'"
+            />
+          </div>
+        </div>
       </template>
 
       <form class="space-y-5" @submit.prevent="submit">
+        <!-- Subida directa de archivo -->
+        <div v-if="mode === 'file'" class="space-y-3">
+          <label class="block text-sm font-medium text-highlighted">Archivo del material</label>
+          <input
+            ref="fileInputRef"
+            type="file"
+            class="hidden"
+            @change="onFileChange"
+          />
+
+          <div
+            v-if="!selectedFile"
+            class="border-2 border-dashed border-muted hover:border-primary/60 transition-colors rounded-xl p-6 text-center cursor-pointer bg-muted/10"
+            @click="fileInputRef?.click()"
+          >
+            <div class="flex flex-col items-center gap-2">
+              <div class="p-3 rounded-full bg-primary/10 text-primary">
+                <UIcon name="i-heroicons-cloud-arrow-up" class="size-6" />
+              </div>
+              <p class="text-sm font-semibold text-default">
+                Haz clic para seleccionar o subir un archivo
+              </p>
+              <p class="text-xs text-muted">
+                PDF, Word, Excel, ZIP, Imágenes, etc.
+              </p>
+            </div>
+          </div>
+
+          <div
+            v-else
+            class="flex items-center justify-between p-3.5 bg-muted/30 border border-muted rounded-xl"
+          >
+            <div class="flex items-center gap-3 overflow-hidden">
+              <div class="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
+                <UIcon name="i-heroicons-document" class="size-5" />
+              </div>
+              <div class="truncate">
+                <p class="text-sm font-medium text-default truncate">{{ selectedFile.name }}</p>
+                <p class="text-xs text-muted">{{ formatFileSize(selectedFile.size) }}</p>
+              </div>
+            </div>
+            <UButton
+              color="error"
+              variant="ghost"
+              icon="i-heroicons-x-mark"
+              size="xs"
+              @click="clearSelectedFile"
+            />
+          </div>
+        </div>
+
+        <!-- Enlace URL externo -->
+        <UFormField v-else label="Enlace del archivo" name="fileUrl">
+          <UInput
+            v-model="fileUrl"
+            type="url"
+            placeholder="https://drive.google.com/... o https://dropbox.com/..."
+            class="w-full"
+          />
+        </UFormField>
+
         <UFormField label="Título" name="title">
           <UInput v-model="title" placeholder="Ej: Guía de ejercicios N°2" class="w-full" />
         </UFormField>
 
         <UFormField label="Descripción (opcional)" name="description">
-          <UTextarea v-model="description" placeholder="Breve descripción del material..." class="w-full" :rows="3" />
+          <UTextarea v-model="description" placeholder="Breve descripción del material..." class="w-full" :rows="2" />
         </UFormField>
 
-        <UFormField label="Enlace del archivo" name="fileUrl">
-          <UInput v-model="fileUrl" type="url" placeholder="https://..." class="w-full" />
-        </UFormField>
-
-        <UButton
-          type="submit"
-          color="primary"
-          icon="i-heroicons-cloud-arrow-up"
-          label="Agregar material"
-          :loading="submitting"
-        />
+        <div class="pt-2">
+          <UButton
+            type="submit"
+            color="primary"
+            icon="i-heroicons-arrow-up-tray"
+            :label="mode === 'file' ? 'Subir y Guardar' : 'Agregar enlace'"
+            :loading="uploading"
+          />
+        </div>
       </form>
     </UCard>
 
@@ -132,7 +268,7 @@ const remove = async (id: string) => {
         >
           <div class="flex-1">
             <div class="flex items-start gap-3 mb-2">
-              <div class="p-2 rounded-lg bg-secondary/10 text-secondary">
+              <div class="p-2 rounded-lg bg-secondary/10 text-secondary shrink-0">
                 <UIcon name="i-heroicons-document-text" class="size-5" />
               </div>
               <h3 class="font-bold text-default line-clamp-2">{{ material.title }}</h3>
@@ -149,7 +285,7 @@ const remove = async (id: string) => {
               color="secondary"
               variant="soft"
               icon="i-heroicons-arrow-top-right-on-square"
-              label="Abrir"
+              label="Abrir archivo"
               size="sm"
             />
             <UButton
@@ -159,7 +295,7 @@ const remove = async (id: string) => {
               :loading="deletingId === material.id"
               aria-label="Eliminar material"
               size="sm"
-              @click="remove(material.id)"
+              @click="remove(material)"
             />
           </div>
         </UCard>
