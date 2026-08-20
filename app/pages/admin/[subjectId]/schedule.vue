@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Session } from '~/types/sessions'
-import { useSortable } from '@vueuse/integrations'
+import type { SessionForm } from '~/types/sessionForm'
 
 const route = useRoute()
 const subjectId = computed(() => route.params.subjectId as string)
@@ -11,7 +11,6 @@ const { data: sessions, status, error, refresh } = await useFetch<Session[]>('/a
   query: { subjectId },
 })
 
-const dayColumnRefs = ref<Record<string, HTMLElement | null>>({})
 const columns = ref<Record<string, Session[]>>({
   MONDAY: [], TUESDAY: [], WEDNESDAY: [],
   THURSDAY: [], FRIDAY: [], SATURDAY: [], SUNDAY: [],
@@ -26,7 +25,7 @@ function rebuildColumns() {
   for (const d of DAYS) map[d.value] = []
   for (const s of (sessions.value ?? []) as any[]) {
     if (s.isRecurring && s.dayOfWeek && map[s.dayOfWeek]) {
-      map[s.dayOfWeek].push(s)
+      map[s.dayOfWeek]!.push(s)
     }
   }
   columns.value = map
@@ -49,10 +48,10 @@ function moveSession(id: string, fromDay: string, toDay: string) {
   if (idx === -1) return
 
   const [moved] = fromArr.splice(idx, 1)
-  columns.value[toDay].push(moved)
+  columns.value[toDay]?.push(moved!)
 
   if (fromDay !== toDay) {
-    moved.dayOfWeek = toDay
+    moved!.dayOfWeek = toDay
     updateDayOfWeek(id, toDay)
   }
 }
@@ -70,32 +69,24 @@ async function updateDayOfWeek(id: string, day: string) {
   }
 }
 
-onMounted(async () => {
-  for (const d of DAYS) {
-    const container = dayColumnRefs.value[d.value]
-    if (!container) continue
-    useSortable(container, undefined, {
+// Initialize Sortable dynamically using a custom directive to ensure it only runs when the DOM element is actually mounted on the client.
+const vSortable = {
+  async mounted(el: HTMLElement, binding: any) {
+    const day = binding.value
+    const Sortable = (await import('sortablejs')).default
+    new Sortable(el, {
       animation: 150,
       group: 'kanban',
-      onEnd: (evt: any) => onDrop(evt, d.value),
+      onEnd: (evt: any) => onDrop(evt, day),
     })
   }
-})
+}
 
 // ─── Modal: Crear / Editar sesión ───
 const isOpen = ref(false)
 const saving = ref(false)
 
-interface SessionForm {
-  id: string | null
-  title: string
-  isRecurring: boolean
-  dayOfWeek: string
-  date: string
-  startTime: string
-  endTime: string
-  location: string
-}
+
 
 const form = reactive<SessionForm>({
   id: null,
@@ -125,7 +116,7 @@ function openEdit(s: Session) {
   form.title = s.title
   form.isRecurring = s.isRecurring
   form.dayOfWeek = s.dayOfWeek ?? 'MONDAY'
-  form.date = s.date ? new Date(s.date).toISOString().split('T')[0] : ''
+  form.date = s.date ? (new Date(s.date).toISOString().split('T')[0] ?? '') : ''
   form.startTime = s.startTime
   form.endTime = s.endTime
   form.location = s.location ?? ''
@@ -240,15 +231,18 @@ async function removeSession(id: string) {
           <div
             v-for="d in DAYS"
             :key="d.value"
-            :ref="(el: any) => { dayColumnRefs[d.value] = el as HTMLElement | null }"
-            :data-day="d.value"
             class="min-h-[180px] rounded-xl bg-muted/30 border border-muted/50 p-2 flex flex-col gap-2"
           >
             <span class="text-xs font-bold text-highlighted uppercase tracking-wider px-1 pb-1 border-b border-muted/40 text-center">
               {{ d.label }}
             </span>
 
-            <UCard
+            <div
+              v-sortable="d.value"
+              :data-day="d.value"
+              class="flex-1 flex flex-col gap-2"
+            >
+              <UCard
               v-for="session in columns[d.value]"
               :key="session.id"
               :data-id="session.id"
@@ -285,6 +279,7 @@ async function removeSession(id: string) {
                 {{ session.location }}
               </div>
             </UCard>
+            </div>
           </div>
         </div>
 
@@ -362,55 +357,57 @@ async function removeSession(id: string) {
 
     <!-- Modal: Crear / Editar sesión -->
     <UModal v-model:open="isOpen" :title="form.id ? 'Editar sesión' : 'Nueva sesión'" :ui="{ content: 'max-w-lg' }">
-      <form class="space-y-5 p-1" @submit.prevent="saveSession">
-        <UFormField label="Título" name="title">
-          <UInput v-model="form.title" placeholder="Ej: Ayudantía Sección 1" class="w-full" />
-        </UFormField>
+      <template #body>
+        <form class="space-y-5 p-1" @submit.prevent="saveSession">
+          <UFormField label="Título" name="title">
+            <UInput v-model="form.title" placeholder="Ej: Ayudantía Sección 1" class="w-full" />
+          </UFormField>
 
-        <UFormField label="Tipo de sesión" name="isRecurring">
-          <div class="flex gap-4">
-            <URadioGroup v-model="form.isRecurring" :items="[
-              { label: 'Recurrente (semanal)', value: true },
-              { label: 'Extraordinaria (fecha puntual)', value: false },
-            ]" />
+          <UFormField label="Tipo de sesión" name="isRecurring">
+            <div class="flex gap-4">
+              <URadioGroup v-model="form.isRecurring" :items="[
+                { label: 'Recurrente (semanal)', value: true },
+                { label: 'Extraordinaria (fecha puntual)', value: false },
+              ]" />
+            </div>
+          </UFormField>
+
+          <UFormField v-if="form.isRecurring" label="Día de la semana" name="dayOfWeek">
+            <USelect
+              v-model="form.dayOfWeek"
+              :items="DAYS.map(d => ({ label: d.label, value: d.value as string }))"
+              class="w-full"
+            />
+          </UFormField>
+
+          <UFormField v-else label="Fecha" name="date">
+            <UInput v-model="form.date" type="date" class="w-full" />
+          </UFormField>
+
+          <div class="grid grid-cols-2 gap-4">
+            <UFormField label="Hora inicio" name="startTime">
+              <UInput v-model="form.startTime" type="time" class="w-full" />
+            </UFormField>
+            <UFormField label="Hora término" name="endTime">
+              <UInput v-model="form.endTime" type="time" class="w-full" />
+            </UFormField>
           </div>
-        </UFormField>
 
-        <UFormField v-if="form.isRecurring" label="Día de la semana" name="dayOfWeek">
-          <USelect
-            v-model="form.dayOfWeek"
-            :items="DAYS.map(d => ({ label: d.label, value: d.value }))"
-            class="w-full"
-          />
-        </UFormField>
-
-        <UFormField v-else label="Fecha" name="date">
-          <UInput v-model="form.date" type="date" class="w-full" />
-        </UFormField>
-
-        <div class="grid grid-cols-2 gap-4">
-          <UFormField label="Hora inicio" name="startTime">
-            <UInput v-model="form.startTime" type="time" class="w-full" />
+          <UFormField label="Ubicación (opcional)" name="location">
+            <UInput v-model="form.location" placeholder="Ej: Sala A-102" class="w-full" />
           </UFormField>
-          <UFormField label="Hora término" name="endTime">
-            <UInput v-model="form.endTime" type="time" class="w-full" />
-          </UFormField>
-        </div>
 
-        <UFormField label="Ubicación (opcional)" name="location">
-          <UInput v-model="form.location" placeholder="Ej: Sala A-102" class="w-full" />
-        </UFormField>
-
-        <div class="flex justify-end gap-3 pt-2">
-          <UButton color="neutral" variant="ghost" label="Cancelar" @click="isOpen = false" />
-          <UButton
-            type="submit"
-            color="primary"
-            :label="form.id ? 'Guardar cambios' : 'Crear sesión'"
-            :loading="saving"
-          />
-        </div>
-      </form>
+          <div class="flex justify-end gap-3 pt-2">
+            <UButton color="neutral" variant="ghost" label="Cancelar" @click="isOpen = false" />
+            <UButton
+              type="submit"
+              color="primary"
+              :label="form.id ? 'Guardar cambios' : 'Crear sesión'"
+              :loading="saving"
+            />
+          </div>
+        </form>
+      </template>
     </UModal>
   </div>
-</template>
+</template>>
