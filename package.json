@@ -7,6 +7,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "test": "vitest run",
     "postinstall": "prisma generate && nuxt prepare"
   },
   "dependencies": {
@@ -26,11 +27,15 @@
     "vue-router": "^5.2.0"
   },
   "devDependencies": {
+    "@nuxt/test-utils": "^4.1.0",
     "@nuxtjs/supabase": "^2.0.10",
     "@types/node": "^26.2.0",
     "@types/pg": "^8.23.1",
     "@types/sortablejs": "^1.15.9",
+    "@vue/test-utils": "^2.4.11",
+    "happy-dom": "^20.11.6",
     "prisma": "^7.9.1",
-    "tsx": "^4.23.12"
+    "tsx": "^4.23.12",
+    "vitest": "^4.1.11"
   }
 }
