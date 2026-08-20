@@ -58,9 +58,9 @@ function moveSession(id: string, fromDay: string, toDay: string) {
 
 async function updateDayOfWeek(id: string, day: string) {
   try {
-    await $fetch('/api/schedule', {
+    await $fetch(`/api/admin/schedule/${id}`, {
       method: 'PUT',
-      body: { id, dayOfWeek: day },
+      body: { dayOfWeek: day },
     })
     toast.add({ title: `Sesión movida a ${dayLabel(day)}.`, color: 'success' })
   } catch (e: any) {
@@ -148,13 +148,13 @@ async function saveSession() {
   saving.value = true
   try {
     if (form.id) {
-      await $fetch('/api/schedule', {
+      await $fetch(`/api/admin/schedule/${form.id}`, {
         method: 'PUT',
         body: { ...form, date: form.date || null },
       })
       toast.add({ title: 'Sesión actualizada.', color: 'success' })
     } else {
-      await $fetch('/api/schedule', {
+      await $fetch('/api/admin/schedule', {
         method: 'POST',
         body: {
           title: form.title,
@@ -183,7 +183,7 @@ const deletingId = ref('')
 async function removeSession(id: string) {
   deletingId.value = id
   try {
-    await $fetch('/api/schedule', { method: 'DELETE', query: { id } })
+    await $fetch(`/api/admin/schedule/${id}`, { method: 'DELETE' })
     toast.add({ title: 'Sesión eliminada.', color: 'success' })
     await refresh()
   } catch (e: any) {

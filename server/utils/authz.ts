@@ -1,22 +1,35 @@
-import { prisma } from './prisma'
-
-/**
- * Devuelve el ayudante (usuario Prisma) asociado a la sesión actual.
- * El middleware `server/middleware/admin.ts` se encarga de sincronizar el
- * usuario de Supabase Auth con la tabla `User` y lo guarda en el contexto.
- */
 export function getTa(event: H3Event) {
   return event.context.pointaUser ?? null
 }
 
-/**
- * Verifica que la asignatura exista (404) y que el ayudante autenticado
- * esté asignado a ella (403). Devuelve la asignatura si el TA puede editarla.
- */
+export function assertTa(event: H3Event) {
+  const ta = getTa(event)
+  if (!ta) {
+    throw createError({ statusCode: 401, statusMessage: 'No autorizado: debes iniciar sesión.' })
+  }
+  return ta
+}
+
+export function assertAdmin(event: H3Event) {
+  const ta = assertTa(event)
+  if (ta.role !== 'ADMIN') {
+    throw createError({ statusCode: 403, statusMessage: 'No tienes permisos de administrador.' })
+  }
+  return ta
+}
+
 export async function assertTaCanModify(event: H3Event, subjectId: string) {
   const ta = getTa(event)
   if (!ta) {
     throw createError({ statusCode: 401, statusMessage: 'No autorizado: debes iniciar sesión.' })
+  }
+
+  if (ta.role === 'ADMIN') {
+    const subject = await prisma.subject.findUnique({ where: { id: subjectId } })
+    if (!subject) {
+      throw createError({ statusCode: 404, statusMessage: 'Asignatura no encontrada.' })
+    }
+    return subject
   }
 
   const subject = await prisma.subject.findFirst({

@@ -1,18 +1,71 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
+const { data: me } = await useFetch('/api/auth/me')
+const isAdmin = computed(() => me.value?.role === 'ADMIN')
+
 const { data: subjects, status, error, refresh } = await useFetch('/api/subjects', {
   query: { mine: 'true' },
 })
+
+// Create subject modal
+const showCreate = ref(false)
+const form = reactive({ name: '', code: '', semester: '' })
+const creating = ref(false)
+const createError = ref('')
+
+const { data: allUsers } = await useFetch('/api/admin/users', {
+  query: {},
+  immediate: isAdmin.value,
+})
+
+const selectedUserIds = ref<string[]>([])
+
+const handleCreate = async () => {
+  creating.value = true
+  createError.value = ''
+  try {
+    await $fetch('/api/admin/subjects', {
+      method: 'POST',
+      body: {
+        name: form.name,
+        code: form.code || undefined,
+        semester: form.semester,
+        userIds: selectedUserIds.value,
+      },
+    })
+    showCreate.value = false
+    form.name = ''
+    form.code = ''
+    form.semester = ''
+    selectedUserIds.value = []
+    await refresh()
+  } catch (e: any) {
+    createError.value = e.data?.statusMessage ?? 'Error al crear la asignatura.'
+  } finally {
+    creating.value = false
+  }
+}
 </script>
 
 <template>
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold tracking-tight text-highlighted font-display">Mis Asignaturas</h1>
-      <p class="mt-2 text-muted">
-        Selecciona una asignatura para gestionar sus anuncios, materiales y horarios.
-      </p>
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight text-highlighted font-display">
+          {{ isAdmin ? 'Todas las Asignaturas' : 'Mis Asignaturas' }}
+        </h1>
+        <p class="mt-2 text-muted">
+          {{ isAdmin ? 'Gestiona las asignaturas de la plataforma.' : 'Selecciona una asignatura para gestionar su contenido.' }}
+        </p>
+      </div>
+      <UButton
+        v-if="isAdmin"
+        color="primary"
+        icon="i-heroicons-plus"
+        label="Crear asignatura"
+        @click="showCreate = true"
+      />
     </div>
 
     <UAlert
@@ -20,7 +73,7 @@ const { data: subjects, status, error, refresh } = await useFetch('/api/subjects
       color="error"
       variant="soft"
       icon="i-heroicons-exclamation-triangle"
-      title="No se pudieron cargar tus asignaturas."
+      title="No se pudieron cargar las asignaturas."
     >
       <template #description>
         <div class="flex items-center justify-between gap-4">
@@ -39,10 +92,13 @@ const { data: subjects, status, error, refresh } = await useFetch('/api/subjects
       class="text-center py-16 bg-muted/30 rounded-2xl border border-dashed border-muted"
     >
       <UIcon name="i-heroicons-academic-cap" class="text-4xl text-muted mb-4 mx-auto" />
-      <h3 class="text-lg font-semibold text-highlighted mb-2">Aún no administras asignaturas</h3>
-      <p class="text-muted max-w-sm mx-auto">
-        Pídele a un administrador que te asigne una asignatura para comenzar a gestionar su contenido.
+      <h3 class="text-lg font-semibold text-highlighted mb-2">
+        {{ isAdmin ? 'No hay asignaturas creadas' : 'Aún no administras asignaturas' }}
+      </h3>
+      <p class="text-muted max-w-sm mx-auto mb-4">
+        {{ isAdmin ? 'Crea la primera asignatura para comenzar.' : 'Pídele a un administrador que te asigne una asignatura.' }}
       </p>
+      <UButton v-if="isAdmin" color="primary" icon="i-heroicons-plus" label="Crear asignatura" @click="showCreate = true" />
     </div>
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -83,5 +139,45 @@ const { data: subjects, status, error, refresh } = await useFetch('/api/subjects
         </div>
       </UCard>
     </div>
+
+    <!-- Create Subject Modal -->
+    <UModal v-model:open="showCreate" title="Crear asignatura">
+      <template #body>
+        <form class="space-y-4" @submit.prevent="handleCreate">
+          <UFormField label="Nombre" name="name" required>
+            <UInput v-model="form.name" placeholder="Ej: Álgebra Lineal" class="w-full" />
+          </UFormField>
+          <div class="grid grid-cols-2 gap-4">
+            <UFormField label="Código" name="code">
+              <UInput v-model="form.code" placeholder="Ej: MAT201" class="w-full" />
+            </UFormField>
+            <UFormField label="Semestre" name="semester" required>
+              <UInput v-model="form.semester" placeholder="Ej: 2026-1" class="w-full" />
+            </UFormField>
+          </div>
+          <div v-if="allUsers?.length" class="space-y-2">
+            <label class="text-sm font-medium text-default">Ayudantes asignados</label>
+            <USelectMenu
+              v-model="selectedUserIds"
+              :items="allUsers.map((u: any) => ({ label: `${u.name} (${u.email})`, value: u.id }))"
+              multiple
+              placeholder="Seleccionar ayudantes (opcional)"
+              class="w-full"
+            />
+          </div>
+          <UAlert
+            v-if="createError"
+            color="error"
+            variant="soft"
+            icon="i-heroicons-exclamation-circle"
+            :description="createError"
+          />
+          <div class="flex justify-end gap-3 pt-2">
+            <UButton color="neutral" variant="ghost" label="Cancelar" @click="showCreate = false" />
+            <UButton type="submit" color="primary" label="Crear" :loading="creating" />
+          </div>
+        </form>
+      </template>
+    </UModal>
   </div>
 </template>

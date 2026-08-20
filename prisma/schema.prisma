@@ -7,6 +7,11 @@ generator client {
   output   = "../server/generated"
 }
 
+enum Role {
+  ADMIN
+  TA
+}
+
 enum DayOfWeek {
   MONDAY
   TUESDAY
@@ -21,6 +26,7 @@ model User {
   id       String    @id @default(uuid())
   name     String
   email    String    @unique
+  role     Role      @default(TA)
   subjects Subject[]
 }
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-const { data: subjects, status, error, refresh } = await useFetch('/api/subjects')
+import type { Subject } from '~/types/subjects'
+const { data: subjects, status, error, refresh } = await useFetch<Subject[]>('/api/subjects')
 </script>
 
 <template>
@@ -14,8 +15,9 @@ const { data: subjects, status, error, refresh } = await useFetch('/api/subjects
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
         <div class="mx-auto max-w-2xl text-center">
           <h1 class="text-4xl font-bold tracking-tight text-white sm:text-6xl font-display">
-            Plataforma de Ayudantías
+            Plataforma de Ayudantías Informáticas
           </h1>
+
           <p class="mt-6 text-lg leading-8 text-ink-200">
             Encuentra todo el material, anuncios y horarios de las sesiones de ayudantía para tus asignaturas, organizado en un solo lugar.
           </p>
@@ -47,7 +49,7 @@ const { data: subjects, status, error, refresh } = await useFetch('/api/subjects
         <template #description>
           <div class="flex items-center justify-between gap-4">
             <span>Ocurrió un error al consultar la plataforma.</span>
-            <UButton color="neutral" variant="soft" size="sm" @click="refresh">Reintentar</UButton>
+            <UButton color="neutral" variant="soft" size="sm" @click="()=>refresh">Reintentar</UButton>
           </div>
         </template>
       </UAlert>
@@ -61,7 +63,7 @@ const { data: subjects, status, error, refresh } = await useFetch('/api/subjects
         >
           <UCard 
             :ui="{ 
-              base: 'transition-all duration-200 hover:-translate-y-1 hover:shadow-xl border border-transparent hover:border-primary/20',
+              root: 'transition-all duration-200 hover:-translate-y-1 hover:shadow-xl border border-transparent hover:border-primary/20',
               body: 'flex flex-col h-full justify-between gap-4 p-6'
             }"
           >

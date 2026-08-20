@@ -1,6 +1,9 @@
 <script setup lang="ts">
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
+const { data: me } = await useFetch('/api/auth/me')
+
+const isAdmin = computed(() => me.value?.role === 'ADMIN')
 
 const handleLogout = async () => {
   await supabase.auth.signOut()
@@ -20,9 +23,19 @@ const handleLogout = async () => {
 
         <div class="flex items-center gap-3">
           <UColorModeButton />
+          <UButton
+            v-if="isAdmin"
+            to="/admin/users"
+            color="neutral"
+            variant="ghost"
+            icon="i-heroicons-users"
+            label="Usuarios"
+            size="sm"
+            class="hidden sm:inline-flex"
+          />
           <span v-if="user?.email" class="text-sm text-ink-300 hidden md:inline">{{ user.email }}</span>
           <UButton
-            color="white"
+            color="neutral"
             variant="ghost"
             icon="i-heroicons-arrow-left-on-rectangle"
             label="Cerrar sesión"

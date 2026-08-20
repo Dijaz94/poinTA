@@ -20,7 +20,7 @@ const submit = async () => {
 
   submitting.value = true
   try {
-    await $fetch('/api/announcements', {
+    await $fetch('/api/admin/announcements', {
       method: 'POST',
       body: {
         title: title.value.trim(),
@@ -45,7 +45,7 @@ const submit = async () => {
 const remove = async (id: string) => {
   deletingId.value = id
   try {
-    await $fetch('/api/announcements', { method: 'DELETE', query: { id } })
+    await $fetch(`/api/admin/announcements/${id}`, { method: 'DELETE' })
     toast.add({ title: 'Anuncio eliminado.', color: 'success' })
     await refresh()
   } catch (e: any) {

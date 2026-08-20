@@ -5,6 +5,7 @@ export default defineNuxtConfig({
   modules: ['@nuxt/ui', '@nuxtjs/supabase'],
   supabase: {
     redirect: false,
+    types: false
   },
   css: ['~/assets/css/main.css'],
   fonts: {
