@@ -1,4 +1,4 @@
-import { PrismaClient } from '../../app/generated/prisma/client'
+import { PrismaClient } from '../generated/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 
 // Usamos un nombre distinto al export (`__prisma`) para que el global del

@@ -1,2 +1,126 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
+
+/*
+ * PoinTA "Tinta & Papel" palette
+ * OKLCH-based ramps, vivid jewel tones + warm paper neutral + deep ink chrome
+ */
+@theme static {
+  /* Indigo — primary */
+  --color-indigo-50: #f2f5fc;
+  --color-indigo-100: #e3e8f6;
+  --color-indigo-200: #cad4ef;
+  --color-indigo-300: #acbcec;
+  --color-indigo-400: #879bdd;
+  --color-indigo-500: #4357ad;
+  --color-indigo-600: #3a4c96;
+  --color-indigo-700: #2e3d7d;
+  --color-indigo-800: #212b5a;
+  --color-indigo-900: #151b3a;
+  --color-indigo-950: #0b0f22;
+
+  /* Teal — secondary */
+  --color-teal-50: #eef8f7;
+  --color-teal-100: #d9efed;
+  --color-teal-200: #b3dfd9;
+  --color-teal-300: #82c8c2;
+  --color-teal-400: #4dada4;
+  --color-teal-500: #2e9791;
+  --color-teal-600: #257b76;
+  --color-teal-700: #1c5f5a;
+  --color-teal-800: #123f3c;
+  --color-teal-900: #0b2725;
+  --color-teal-950: #051414;
+
+  /* Stone — neutral (warm paper) */
+  --color-stone-50: #f8f6f1;
+  --color-stone-100: #f2ede4;
+  --color-stone-200: #e7e0d2;
+  --color-stone-300: #d5cbb8;
+  --color-stone-400: #b8ac98;
+  --color-stone-500: #948a7c;
+  --color-stone-600: #766c5e;
+  --color-stone-700: #595248;
+  --color-stone-800: #3a3530;
+  --color-stone-900: #221f1a;
+  --color-stone-950: #13110e;
+
+  /* Amber — warning */
+  --color-amber-50: #faf4ee;
+  --color-amber-100: #f3e7d8;
+  --color-amber-200: #e6ceb0;
+  --color-amber-300: #dab282;
+  --color-amber-400: #cc9250;
+  --color-amber-500: #c0834a;
+  --color-amber-600: #9a6538;
+  --color-amber-700: #754a2a;
+  --color-amber-800: #4d301c;
+  --color-amber-900: #28180e;
+  --color-amber-950: #150905;
+
+  /* Rose — error */
+  --color-rose-50: #fcf3f3;
+  --color-rose-100: #f6e1e3;
+  --color-rose-200: #edc5c8;
+  --color-rose-300: #e4a2a7;
+  --color-rose-400: #d57d83;
+  --color-rose-500: #c05860;
+  --color-rose-600: #984349;
+  --color-rose-700: #723034;
+  --color-rose-800: #4c1c20;
+  --color-rose-900: #2a0e11;
+  --color-rose-950: #160608;
+
+  /* Ink — chrome (deep indigo-navy) */
+  --color-ink-50: #f0f2f8;
+  --color-ink-100: #dde1ef;
+  --color-ink-200: #bcc4e0;
+  --color-ink-300: #98a2cc;
+  --color-ink-400: #7581b4;
+  --color-ink-500: #556496;
+  --color-ink-600: #3f4b76;
+  --color-ink-700: #2f3858;
+  --color-ink-800: #1e243d;
+  --color-ink-900: #131828;
+  --color-ink-950: #0a0e1a;
+
+  /* Typography */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --ui-bg: #ece5d8;
+  --ui-bg-muted: #f3ede3;
+  --ui-bg-elevated: #fbf8f1;
+  --ui-bg-accented: #dfd6c5;
+  --ui-bg-inverted: #131828;
+  --ui-border: #dfd6c5;
+  --ui-border-muted: #e8e1d2;
+  --ui-border-accented: #cfc4af;
+  --ui-border-inverted: #131828;
+  --ui-text-dimmed: #b8ac98;
+  --ui-text-muted: #948a7c;
+  --ui-text-toned: #766c5e;
+  --ui-text: #595248;
+  --ui-text-highlighted: #221f1a;
+  --ui-text-inverted: #f8f6f1;
+}
+
+.dark {
+  --ui-bg: #0e1329;
+  --ui-bg-muted: #171e37;
+  --ui-bg-elevated: #1c2444;
+  --ui-bg-accented: #25305a;
+  --ui-bg-inverted: #f8f6f1;
+  --ui-border: #2a3458;
+  --ui-border-muted: #232c4e;
+  --ui-border-accented: #36406b;
+  --ui-border-inverted: #f8f6f1;
+  --ui-text-dimmed: #556496;
+  --ui-text-muted: #7581b4;
+  --ui-text-toned: #98a2cc;
+  --ui-text: #dde1ef;
+  --ui-text-highlighted: #ffffff;
+  --ui-text-inverted: #0e1329;
+}
