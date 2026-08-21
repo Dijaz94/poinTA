@@ -40,9 +40,12 @@ const handleLogin = async () => {
     <div class="w-full max-w-md">
       <UCard>
         <template #header>
-          <div class="text-center">
-            <h2 class="text-3xl font-bold tracking-tight text-highlighted font-display">Portal de Ayudantes</h2>
-            <p class="mt-2 text-sm text-muted">Ingresa tus credenciales para administrar la plataforma</p>
+          <div class="text-center flex flex-col items-center">
+            <div class="mb-3">
+              <AppLogo size="lg" :show-text="false" />
+            </div>
+            <h2 class="text-2xl font-bold tracking-tight text-highlighted font-display">Portal de Ayudantes</h2>
+            <p class="mt-1 text-sm text-muted">Ingresa tus credenciales para administrar la plataforma</p>
           </div>
         </template>
 

@@ -17,10 +17,8 @@ const handleLogout = async () => {
   <div class="min-h-screen bg-default">
     <header class="bg-ink-900 border-b border-ink-800 sticky top-0 z-50">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        <NuxtLink to="/admin" class="flex items-center gap-2.5 group">
-          <span class="size-3 rounded-full bg-secondary inline-block" />
-          <span class="font-bold text-lg text-white tracking-tight font-display">PoinTA</span>
-          <span class="text-xs text-ink-300 hidden sm:inline">Portal de Ayudantes</span>
+        <NuxtLink to="/admin">
+          <AppLogo subtitle="Portal de Ayudantes" />
         </NuxtLink>
 
         <div class="flex items-center gap-3">
