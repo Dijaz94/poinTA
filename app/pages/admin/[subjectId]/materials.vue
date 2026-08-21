@@ -13,13 +13,13 @@ const deletingUnitId = ref('')
 const newUnitName = ref('')
 const newUnitParentId = ref('none')
 
-const { data: materials, status, error, refresh } = await useFetch<Material[]>('/api/materials', {
-  query: { subjectId },
-})
-
-const { data: units, refresh: refreshUnits } = await useFetch<Unit[]>('/api/units', {
-  query: { subjectId },
-})
+const [
+  { data: materials, status, error, refresh: refreshMaterials },
+  { data: units, refresh: refreshUnits }
+] = await Promise.all([
+  useFetch<Material[]>('/api/materials', { query: { subjectId } }),
+  useFetch<Unit[]>('/api/units', { query: { subjectId } })
+])
 
 const handleCreateUnit = async () => {
   if (!newUnitName.value.trim()) return
@@ -39,7 +39,7 @@ const handleCreateUnit = async () => {
     newUnitParentId.value = 'none'
     
     // Ejecutar ambos refrescos en paralelo sin bloquear infinitamente
-    refresh()
+    refreshMaterials()
     refreshUnits()
   } catch (e: any) {
     toast.add({
@@ -63,7 +63,7 @@ const handleDeleteUnit = async (unit: Unit) => {
     })
     toast.add({ title: 'Unidad eliminada.', color: 'success' })
     refreshUnits()
-    refresh()
+    refreshMaterials()
   } catch (e: any) {
     toast.add({
       title: e?.data?.statusMessage ?? e?.message ?? 'Error al eliminar la unidad.',
@@ -253,7 +253,7 @@ const submit = async () => {
     fileUrl.value = ''
     clearSelectedFile()
     toast.add({ title: 'Material agregado con éxito.', color: 'success' })
-    await refresh()
+    await refreshMaterials()
   } catch (e: any) {
     console.error('Error al guardar material:', e)
     toast.add({
@@ -277,7 +277,7 @@ const remove = async (material: Material) => {
   try {
     await $fetch(`/api/admin/materials/${material.id}`, { method: 'DELETE' })
     toast.add({ title: 'Material eliminado.', color: 'success' })
-    await refresh()
+    await refreshMaterials()
   } catch (e: any) {
     toast.add({
       title: e?.data?.statusMessage ?? 'No se pudo eliminar el material.',
@@ -434,7 +434,7 @@ const remove = async (material: Material) => {
         <template #description>
           <div class="flex items-center justify-between gap-4">
             <span>Ocurrió un error al consultar la plataforma.</span>
-            <UButton color="neutral" variant="soft" size="sm" @click="() => refresh()">Reintentar</UButton>
+            <UButton color="neutral" variant="soft" size="sm" @click="() => refreshMaterials()">Reintentar</UButton>
           </div>
         </template>
       </UAlert>

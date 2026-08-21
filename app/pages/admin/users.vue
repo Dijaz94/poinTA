@@ -4,9 +4,15 @@ import type { Subject } from '~/types/subjects'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
-const { data: me } = await useFetch<Me>('/api/auth/me')
-const { data: users, status, error, refresh } = await useFetch<User[]>('/api/admin/users')
-const { data: allSubjects } = await useFetch<Subject[]>('/api/subjects')
+const { data: me } = await useMe()
+
+const [
+  { data: users, status, error, refresh },
+  { data: allSubjects }
+] = await Promise.all([
+  useFetch<User[]>('/api/admin/users'),
+  useFetch<Subject[]>('/api/subjects')
+])
 
 // Create user state
 const showCreate = ref(false)

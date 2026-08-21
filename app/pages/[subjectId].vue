@@ -45,7 +45,7 @@ const links = computed(() => [
           </div>
 
           <div v-else-if="subject" class="flex items-center gap-3">
-            <h1 class="text-xl font-bold text-highlighted truncate max-w-[200px] sm:max-w-md font-display">
+            <h1 class="text-xl font-bold text-highlighted truncate max-w-50 sm:max-w-md font-display">
               {{ subject.name }}
             </h1>
             <UBadge color="neutral" variant="subtle" size="sm" class="hidden sm:inline-flex">

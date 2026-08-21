@@ -61,11 +61,11 @@ const textSizeClasses = {
     <!-- Text Logo -->
     <div v-if="showText" class="flex flex-col leading-none">
       <div class="flex items-center">
-        <span class="font-bold text-white tracking-tight font-display" :class="textSizeClasses[size]">
-          Poin<span class="text-primary-400">TA</span>
+        <span class="font-bold text-ink-900 dark:text-white tracking-tight font-display transition-colors duration-300" :class="textSizeClasses[size]">
+          Poin<span class="text-primary-600 dark:text-primary-400">TA</span>
         </span>
       </div>
-      <span v-if="subtitle" class="text-xs text-ink-300 hidden sm:inline mt-0.5">
+      <span v-if="subtitle" class="text-xs text-ink-500 dark:text-ink-300 hidden sm:inline mt-0.5 transition-colors duration-300">
         {{ subtitle }}
       </span>
     </div>

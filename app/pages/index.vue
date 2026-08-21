@@ -19,24 +19,24 @@ const filteredSubjects = computed(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-default">
+  <div class="min-h-screen bg-white dark:bg-default transition-colors duration-300">
     <!-- Hero Section -->
-    <div class="relative overflow-hidden bg-ink-950 py-24 sm:py-32 isolate">
-      <!-- Dark Graph Paper Pattern -->
-      <div class="absolute inset-0 -z-10 bg-[radial-gradient(#1e243d_1px,transparent_1px)] bg-size-[16px_16px] opacity-70" aria-hidden="true" />
+    <div class="relative overflow-hidden bg-default dark:bg-ink-950 py-24 sm:py-32 isolate border-b border-muted transition-colors duration-300">
+      <!-- Graph Paper Pattern -->
+      <div class="absolute inset-0 -z-10 bg-[radial-gradient(#d1d5db_1px,transparent_1px)] dark:bg-[radial-gradient(#1e243d_1px,transparent_1px)] bg-size-[16px_16px] opacity-70 transition-colors duration-300" aria-hidden="true" />
 
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
         <div class="mx-auto max-w-2xl text-center">
-          <h1 class="text-4xl font-bold tracking-tight text-white sm:text-6xl font-display">
+          <h1 class="text-4xl font-bold tracking-tight text-ink-900 dark:text-white sm:text-6xl font-display transition-colors">
             Plataforma de Ayudantías Informáticas
           </h1>
 
-          <p class="mt-6 text-lg leading-8 text-ink-200">
+          <p class="mt-6 text-lg leading-8 text-ink-600 dark:text-ink-200 transition-colors">
             Encuentra todo el material, anuncios y horarios de las sesiones de ayudantía para tus asignaturas, organizado en un solo lugar.
           </p>
           
           <!-- Search Input -->
-          <div class="mt-10 max-w-xl mx-auto relative dark">
+          <div class="mt-10 max-w-xl mx-auto relative">
             <UInput 
               v-model="searchQuery"
               icon="i-lucide-search" 
@@ -44,7 +44,7 @@ const filteredSubjects = computed(() => {
               placeholder="Buscar por nombre o código de asignatura..." 
               :ui="{
                 root: 'text-left',
-                base: 'bg-ink-900 border-ink-800 focus:border-teal-500 text-white placeholder-ink-400 transition-colors shadow-none rounded-xl'
+                base: 'bg-white dark:bg-ink-900 border-ink-200 dark:border-ink-800 focus:border-primary text-default placeholder-muted transition-colors shadow-sm rounded-xl'
               }"
             >
               <template #trailing>

@@ -3,7 +3,7 @@ import type { Me } from '~/types/users'
 
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
-const { data: me } = await useFetch<Me>('/api/auth/me')
+const { data: me } = await useMe()
 
 const isAdmin = computed(() => me.value?.role === 'ADMIN')
 
@@ -14,8 +14,8 @@ const handleLogout = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-default">
-    <header class="bg-ink-900 border-b border-ink-800 sticky top-0 z-50">
+  <div class="min-h-screen bg-default transition-colors duration-300">
+    <header class="bg-white dark:bg-ink-950 border-b border-muted dark:border-ink-800 sticky top-0 z-50 transition-colors duration-300">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         <NuxtLink to="/admin">
           <AppLogo subtitle="Portal de Ayudantes" />
@@ -33,7 +33,7 @@ const handleLogout = async () => {
             size="sm"
             class="hidden sm:inline-flex"
           />
-          <span v-if="user?.email" class="text-sm text-ink-300 hidden md:inline">{{ user.email }}</span>
+          <span v-if="user?.email" class="text-sm text-ink-600 dark:text-ink-300 hidden md:inline transition-colors duration-300">{{ user.email }}</span>
           <UButton
             color="neutral"
             variant="ghost"

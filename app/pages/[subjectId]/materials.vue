@@ -4,13 +4,13 @@ import type { Material, Unit } from '~/types/materials'
 const route = useRoute()
 const subjectId = computed(() => route.params.subjectId as string)
 
-const { data: materials, status, error, refresh } = await useFetch<Material[]>('/api/materials', {
-  query: { subjectId },
-})
-
-const { data: units } = await useFetch<Unit[]>('/api/units', {
-  query: { subjectId },
-})
+const [
+  { data: materials, status, error, refresh },
+  { data: units }
+] = await Promise.all([
+  useFetch<Material[]>('/api/materials', { query: { subjectId } }),
+  useFetch<Unit[]>('/api/units', { query: { subjectId } })
+])
 
 interface SectionGroup {
   id: string

@@ -9,7 +9,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   // Role guard for admin-only pages
   if (to.path.startsWith('/admin/users')) {
-    const { data } = await useFetch('/api/auth/me')
+    const { data } = await useMe()
     if (data.value?.role !== 'ADMIN') {
       return navigateTo('/admin')
     }

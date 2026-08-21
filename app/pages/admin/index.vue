@@ -4,23 +4,27 @@ import type { Subject } from '~/types/subjects'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
-const { data: me } = await useFetch<Me>('/api/auth/me')
+const { data: me } = await useMe()
 const isAdmin = computed(() => me.value?.role === 'ADMIN')
 
-const { data: subjects, status, error, refresh } = await useFetch<Subject[]>('/api/subjects', {
-  query: { mine: 'true' },
-})
+const [
+  { data: subjects, status, error, refresh },
+  { data: allUsers }
+] = await Promise.all([
+  useFetch<Subject[]>('/api/subjects', {
+    query: { mine: 'true' },
+  }),
+  useFetch<User[]>('/api/admin/users', {
+    query: {},
+    immediate: isAdmin.value,
+  })
+])
 
 // Create subject modal
 const showCreate = ref(false)
 const form = reactive({ name: '', code: '', semester: '' })
 const creating = ref(false)
 const createError = ref('')
-
-const { data: allUsers } = await useFetch<User[]>('/api/admin/users', {
-  query: {},
-  immediate: isAdmin.value,
-})
 
 const selectedUserIds = ref<string[]>([])
 
