@@ -23,7 +23,7 @@ const { data: announcements, status, error, refresh } = await useFetch<Announcem
       v-if="error"
       color="error"
       variant="soft"
-      icon="i-heroicons-exclamation-triangle"
+      icon="i-lucide-triangle-alert"
       title="No se pudieron cargar los anuncios."
       class="mb-6"
     >
@@ -46,7 +46,7 @@ const { data: announcements, status, error, refresh } = await useFetch<Announcem
     </div>
 
     <div v-else-if="announcements?.length === 0" class="text-center py-16 bg-muted/30 rounded-2xl border border-dashed border-muted">
-      <UIcon name="i-heroicons-megaphone" class="text-4xl text-muted mb-4" />
+      <UIcon name="i-lucide-megaphone" class="text-4xl text-muted mb-4" />
       <h3 class="text-lg font-semibold text-highlighted mb-2">No hay anuncios ni votaciones</h3>
       <p class="text-muted max-w-sm mx-auto">
         Aún no se han publicado avisos para esta asignatura. Vuelve a revisar más tarde.
@@ -75,13 +75,13 @@ const { data: announcements, status, error, refresh } = await useFetch<Announcem
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div class="flex items-center gap-2">
                 <UBadge color="neutral" variant="subtle" size="xs">
-                  <UIcon name="i-heroicons-megaphone" class="size-3 mr-1" />
+                  <UIcon name="i-lucide-megaphone" class="size-3 mr-1" />
                   Comunicado
                 </UBadge>
                 <h3 class="font-bold text-lg text-default">{{ announcement.title }}</h3>
               </div>
               <div class="flex items-center gap-1.5 text-xs text-muted whitespace-nowrap">
-                <UIcon name="i-heroicons-clock" class="size-3.5" />
+                <UIcon name="i-lucide-clock" class="size-3.5" />
                 {{ formatDateTime(announcement.createdAt) }}
               </div>
             </div>

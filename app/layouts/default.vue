@@ -12,7 +12,7 @@
             to="/login"
             color="neutral"
             variant="ghost"
-            icon="i-heroicons-lock-closed"
+            icon="i-lucide-lock"
             label="TAs"
             size="sm"
           />

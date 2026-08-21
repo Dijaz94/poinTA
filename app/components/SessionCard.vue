@@ -30,15 +30,15 @@ const emit = defineEmits<{
           <h4 class="font-bold text-default">{{ session.title }}</h4>
           <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-sm text-muted">
             <span v-if="session.date" class="flex items-center gap-1.5">
-              <UIcon name="i-heroicons-calendar-days" class="size-4" />
+              <UIcon name="i-lucide-calendar-days" class="size-4" />
               {{ formatFullDate(session.date) }}
             </span>
             <span class="flex items-center gap-1.5">
-              <UIcon name="i-heroicons-clock" class="size-4" />
+              <UIcon name="i-lucide-clock" class="size-4" />
               {{ session.startTime }} – {{ session.endTime }}
             </span>
             <span v-if="session.location" class="flex items-center gap-1.5">
-              <UIcon name="i-heroicons-map-pin" class="size-4" />
+              <UIcon name="i-lucide-map-pin" class="size-4" />
               {{ session.location }}
             </span>
           </div>
@@ -47,7 +47,7 @@ const emit = defineEmits<{
           <UButton
             color="neutral"
             variant="ghost"
-            icon="i-heroicons-pencil-square"
+            icon="i-lucide-square-pen"
             size="sm"
             aria-label="Editar"
             @click="emit('edit', session)"
@@ -55,7 +55,7 @@ const emit = defineEmits<{
           <UButton
             color="error"
             variant="ghost"
-            icon="i-heroicons-trash"
+            icon="i-lucide-trash"
             size="sm"
             :loading="deleting"
             aria-label="Eliminar"
@@ -72,7 +72,7 @@ const emit = defineEmits<{
           <UButton
             color="neutral"
             variant="ghost"
-            icon="i-heroicons-pencil-square"
+            icon="i-lucide-square-pen"
             size="xs"
             aria-label="Editar"
             @click="emit('edit', session)"
@@ -80,7 +80,7 @@ const emit = defineEmits<{
           <UButton
             color="error"
             variant="ghost"
-            icon="i-heroicons-trash"
+            icon="i-lucide-trash"
             size="xs"
             :loading="deleting"
             aria-label="Eliminar"
@@ -89,11 +89,11 @@ const emit = defineEmits<{
         </div>
       </div>
       <div class="flex items-center gap-2 text-xs text-muted">
-        <UIcon name="i-heroicons-clock" class="size-3" />
+        <UIcon name="i-lucide-clock" class="size-3" />
         {{ session.startTime }} – {{ session.endTime }}
       </div>
       <div v-if="session.location" class="flex items-center gap-2 text-xs text-muted">
-        <UIcon name="i-heroicons-map-pin" class="size-3" />
+        <UIcon name="i-lucide-map-pin" class="size-3" />
         {{ session.location }}
       </div>
     </template>

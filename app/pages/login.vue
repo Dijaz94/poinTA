@@ -55,7 +55,7 @@ const handleLogin = async () => {
             <UInput
               v-model="email"
               type="email"
-              icon="i-heroicons-envelope"
+              icon="i-lucide-mail"
               placeholder="tu@correo.cl"
               required
               class="w-full"
@@ -66,7 +66,7 @@ const handleLogin = async () => {
             <UInput
               v-model="password"
               type="password"
-              icon="i-heroicons-lock-closed"
+              icon="i-lucide-lock"
               placeholder="••••••••"
               required
               class="w-full"
@@ -77,7 +77,7 @@ const handleLogin = async () => {
             v-if="errorMsg"
             color="error"
             variant="soft"
-            icon="i-heroicons-exclamation-circle"
+            icon="i-lucide-circle-alert"
             :description="errorMsg"
           />
 
@@ -93,7 +93,7 @@ const handleLogin = async () => {
 
         <template #footer>
           <div class="text-center">
-            <UButton to="/" variant="link" color="neutral" size="sm" icon="i-heroicons-arrow-left">
+            <UButton to="/" variant="link" color="neutral" size="sm" icon="i-lucide-arrow-left">
               Volver a la vista de estudiantes
             </UButton>
           </div>

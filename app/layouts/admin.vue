@@ -28,7 +28,7 @@ const handleLogout = async () => {
             to="/admin/users"
             color="neutral"
             variant="ghost"
-            icon="i-heroicons-users"
+            icon="i-lucide-users"
             label="Usuarios"
             size="sm"
             class="hidden sm:inline-flex"
@@ -37,7 +37,7 @@ const handleLogout = async () => {
           <UButton
             color="neutral"
             variant="ghost"
-            icon="i-heroicons-arrow-left-on-rectangle"
+            icon="i-lucide-arrow-left-on-rectangle"
             label="Cerrar sesión"
             size="sm"
             @click="handleLogout"

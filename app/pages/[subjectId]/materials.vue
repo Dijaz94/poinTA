@@ -19,7 +19,7 @@ const { data: materials, status, error, refresh } = await useFetch<Material[]>('
       v-if="error"
       color="error"
       variant="soft"
-      icon="i-heroicons-exclamation-triangle"
+      icon="i-lucide-triangle-alert"
       title="No se pudieron cargar los materiales."
       class="mb-6"
     >
@@ -36,7 +36,7 @@ const { data: materials, status, error, refresh } = await useFetch<Material[]>('
     </div>
 
     <div v-else-if="materials?.length === 0" class="text-center py-16 bg-muted/30 rounded-2xl border border-dashed border-muted">
-      <UIcon name="i-heroicons-folder-open" class="text-4xl text-muted mb-4" />
+      <UIcon name="i-lucide-folder-open" class="text-4xl text-muted mb-4" />
       <h3 class="text-lg font-semibold text-highlighted mb-2">No hay materiales</h3>
       <p class="text-muted max-w-sm mx-auto">
         No se han subido materiales para esta asignatura aún.
@@ -55,7 +55,7 @@ const { data: materials, status, error, refresh } = await useFetch<Material[]>('
         <div class="flex-1">
           <div class="flex items-start gap-3 mb-2">
             <div class="p-2 rounded-lg bg-secondary/10 text-secondary mt-0.5">
-              <UIcon name="i-heroicons-document-text" class="size-5" />
+              <UIcon name="i-lucide-file-text" class="size-5" />
             </div>
             <div>
               <h3 class="font-bold text-default line-clamp-2">{{ material.title }}</h3>
@@ -72,7 +72,7 @@ const { data: materials, status, error, refresh } = await useFetch<Material[]>('
             target="_blank"
             color="secondary"
             variant="soft"
-            icon="i-heroicons-arrow-top-right-on-square"
+            icon="i-lucide-external-link"
             label="Abrir enlace"
             size="sm"
           />

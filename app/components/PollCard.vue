@@ -128,7 +128,7 @@ const submitVote = async () => {
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div class="flex items-center gap-2">
           <UBadge color="primary" variant="subtle" size="xs">
-            <UIcon name="i-heroicons-chart-bar" class="size-3 mr-1" />
+            <UIcon name="i-lucide-chart-bar" class="size-3 mr-1" />
             Votación
           </UBadge>
 
@@ -138,13 +138,13 @@ const submitVote = async () => {
             variant="soft"
             size="xs"
           >
-            <UIcon name="i-heroicons-clock" class="size-3 mr-1" />
+            <UIcon name="i-lucide-clock" class="size-3 mr-1" />
             {{ isPollExpired ? 'Votación Cerrada' : `Cierra: ${formatDateTime(announcement.deadline)}` }}
           </UBadge>
         </div>
 
         <div class="flex items-center gap-1.5 text-xs text-muted whitespace-nowrap">
-          <UIcon name="i-heroicons-clock" class="size-3.5" />
+          <UIcon name="i-lucide-clock" class="size-3.5" />
           {{ formatDateTime(announcement.createdAt) }}
         </div>
       </div>
@@ -162,7 +162,7 @@ const submitVote = async () => {
     <div v-if="isPollExpired" class="space-y-4 pt-2 border-t border-muted/30">
       <div class="flex items-center justify-between text-xs font-semibold text-muted">
         <span class="flex items-center gap-1 text-error">
-          <UIcon name="i-heroicons-lock-closed" class="size-3.5" />
+          <UIcon name="i-lucide-lock" class="size-3.5" />
           Esta votación ha finalizado. Resultados definitivos:
         </span>
         <span class="text-primary font-bold">
@@ -200,7 +200,7 @@ const submitVote = async () => {
     <div v-else-if="checkStatus === 'already_voted'" class="space-y-4 pt-2 border-t border-muted/30">
       <div class="flex items-center justify-between bg-primary/10 text-primary p-3 rounded-xl border border-primary/20 text-xs sm:text-sm">
         <div class="flex items-center gap-2">
-          <UIcon name="i-heroicons-check-circle" class="size-5 text-primary shrink-0" />
+          <UIcon name="i-lucide-circle-check" class="size-5 text-primary shrink-0" />
           <span>¡Ya registraste tu voto con <strong>{{ email }}</strong>!</span>
         </div>
         <UButton size="xs" variant="ghost" color="neutral" label="Cambiar correo" @click="resetEmail" />
@@ -249,7 +249,7 @@ const submitVote = async () => {
     <!-- CASO 3: Correo no autorizado -->
     <div v-else-if="checkStatus === 'not_authorized'" class="space-y-3 pt-2 border-t border-muted/30">
       <div class="bg-error/10 border border-error/20 text-error p-3.5 rounded-xl text-sm flex items-start gap-2.5">
-        <UIcon name="i-heroicons-exclamation-circle" class="size-5 shrink-0 mt-0.5" />
+        <UIcon name="i-lucide-circle-alert" class="size-5 shrink-0 mt-0.5" />
         <div class="space-y-1">
           <p class="font-semibold">No autorizado para votar</p>
           <p class="text-xs opacity-90">
@@ -271,7 +271,7 @@ const submitVote = async () => {
 
       <!-- Advertencia de voto definitivo -->
       <div class="bg-warning/10 border border-warning/30 text-warning p-3 rounded-xl text-xs flex items-start gap-2">
-        <UIcon name="i-heroicons-exclamation-triangle" class="size-4 shrink-0 mt-0.5" />
+        <UIcon name="i-lucide-triangle-alert" class="size-4 shrink-0 mt-0.5" />
         <span><strong>Atención:</strong> Tu voto es definitivo e irreversible. Una vez enviado no podrás cambiar tu elección.</span>
       </div>
 
@@ -300,7 +300,7 @@ const submitVote = async () => {
       <div class="pt-2 flex items-center justify-end gap-3">
         <UButton
           color="primary"
-          icon="i-heroicons-check"
+          icon="i-lucide-check"
           label="Confirmar y Emitir Voto"
           :loading="voting"
           :disabled="!selectedOptionId"
@@ -319,7 +319,7 @@ const submitVote = async () => {
             :key="opt.id"
             class="p-2.5 rounded-lg bg-muted/20 border border-muted/30 text-sm font-medium text-muted flex items-center gap-2"
           >
-            <UIcon name="i-heroicons-radio" class="size-4 text-muted/60" />
+            <UIcon name="i-lucide-radio" class="size-4 text-muted/60" />
             <span>{{ opt.label }}</span>
           </div>
         </div>
@@ -338,14 +338,14 @@ const submitVote = async () => {
             placeholder="ej: tu.correo@universidad.cl"
             class="flex-1"
             type="email"
-            icon="i-heroicons-envelope"
+            icon="i-lucide-mail"
           />
           <UButton
             type="submit"
             color="primary"
             variant="solid"
             label="Participar"
-            icon="i-heroicons-arrow-right"
+            icon="i-lucide-arrow-right"
             :loading="checking"
           />
         </form>

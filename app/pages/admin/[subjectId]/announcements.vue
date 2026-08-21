@@ -150,7 +150,7 @@ const isExpired = (deadlineVal: string | null) => {
               size="xs"
               :variant="announcementType === 'COMMUNICATION' ? 'solid' : 'ghost'"
               :color="announcementType === 'COMMUNICATION' ? 'primary' : 'neutral'"
-              icon="i-heroicons-megaphone"
+              icon="i-lucide-megaphone"
               label="Comunicado"
               @click="announcementType = 'COMMUNICATION'"
             />
@@ -158,7 +158,7 @@ const isExpired = (deadlineVal: string | null) => {
               size="xs"
               :variant="announcementType === 'POLL' ? 'solid' : 'ghost'"
               :color="announcementType === 'POLL' ? 'primary' : 'neutral'"
-              icon="i-heroicons-chart-bar"
+              icon="i-lucide-chart-bar"
               label="Votación"
               @click="announcementType = 'POLL'"
             />
@@ -217,7 +217,7 @@ const isExpired = (deadlineVal: string | null) => {
                   v-if="options.length > 2"
                   color="neutral"
                   variant="ghost"
-                  icon="i-heroicons-x-mark"
+                  icon="i-lucide-x"
                   size="sm"
                   aria-label="Eliminar opción"
                   @click="removeOption(index)"
@@ -231,7 +231,7 @@ const isExpired = (deadlineVal: string | null) => {
                 size="xs"
                 variant="subtle"
                 color="neutral"
-                icon="i-heroicons-plus"
+                icon="i-lucide-plus"
                 label="Agregar opción"
                 @click="addOption"
               />
@@ -275,7 +275,7 @@ const isExpired = (deadlineVal: string | null) => {
           <UButton
             type="submit"
             color="primary"
-            :icon="announcementType === 'POLL' ? 'i-heroicons-chart-bar' : 'i-heroicons-megaphone'"
+            :icon="announcementType === 'POLL' ? 'i-lucide-chart-bar' : 'i-lucide-megaphone'"
             :label="announcementType === 'POLL' ? 'Publicar Votación' : 'Publicar Anuncio'"
             :loading="submitting"
           />
@@ -321,7 +321,7 @@ const isExpired = (deadlineVal: string | null) => {
                     variant="subtle"
                     size="xs"
                   >
-                    <UIcon :name="announcement.type === 'POLL' ? 'i-heroicons-chart-bar' : 'i-heroicons-megaphone'" class="size-3 mr-1" />
+                    <UIcon :name="announcement.type === 'POLL' ? 'i-lucide-chart-bar' : 'i-lucide-megaphone'" class="size-3 mr-1" />
                     {{ announcement.type === 'POLL' ? 'Votación' : 'Comunicado' }}
                   </UBadge>
 
@@ -331,7 +331,7 @@ const isExpired = (deadlineVal: string | null) => {
                     variant="soft"
                     size="xs"
                   >
-                    <UIcon name="i-heroicons-clock" class="size-3 mr-1" />
+                    <UIcon name="i-lucide-clock" class="size-3 mr-1" />
                     {{ isExpired(announcement.deadline) ? 'Votación Cerrada' : `Cierra: ${formatDateTime(announcement.deadline)}` }}
                   </UBadge>
 
@@ -349,7 +349,7 @@ const isExpired = (deadlineVal: string | null) => {
               <UButton
                 color="error"
                 variant="soft"
-                icon="i-heroicons-trash"
+                icon="i-lucide-trash"
                 size="sm"
                 :loading="deletingId === announcement.id"
                 aria-label="Eliminar publicación"

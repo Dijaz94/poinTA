@@ -101,7 +101,7 @@ const handleCreate = async () => {
       <UButton
         v-if="isAdmin"
         color="primary"
-        icon="i-heroicons-plus"
+        icon="i-lucide-plus"
         label="Crear asignatura"
         @click="showCreate = true"
       />
@@ -111,7 +111,7 @@ const handleCreate = async () => {
       v-if="error"
       color="error"
       variant="soft"
-      icon="i-heroicons-exclamation-triangle"
+      icon="i-lucide-triangle-alert"
       title="No se pudieron cargar las asignaturas."
     >
       <template #description>
@@ -130,14 +130,14 @@ const handleCreate = async () => {
       v-else-if="subjects?.length === 0"
       class="text-center py-16 bg-muted/30 rounded-2xl border border-dashed border-muted"
     >
-      <UIcon name="i-heroicons-academic-cap" class="text-4xl text-muted mb-4 mx-auto" />
+      <UIcon name="i-lucide-graduation-cap" class="text-4xl text-muted mb-4 mx-auto" />
       <h3 class="text-lg font-semibold text-highlighted mb-2">
         {{ isAdmin ? 'No hay asignaturas creadas' : 'Aún no administras asignaturas' }}
       </h3>
       <p class="text-muted max-w-sm mx-auto mb-4">
         {{ isAdmin ? 'Crea la primera asignatura para comenzar.' : 'Pídele a un administrador que te asigne una asignatura.' }}
       </p>
-      <UButton v-if="isAdmin" color="primary" icon="i-heroicons-plus" label="Crear asignatura" @click="showCreate = true" />
+      <UButton v-if="isAdmin" color="primary" icon="i-lucide-plus" label="Crear asignatura" @click="showCreate = true" />
     </div>
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -158,7 +158,7 @@ const handleCreate = async () => {
                 v-if="isAdmin"
                 color="error"
                 variant="ghost"
-                icon="i-heroicons-trash"
+                icon="i-lucide-trash"
                 size="sm"
                 @click="confirmDelete(subject)"
                 title="Eliminar asignatura"
@@ -173,7 +173,7 @@ const handleCreate = async () => {
             :to="`/admin/${subject.id}/announcements`"
             color="primary"
             block
-            icon="i-heroicons-wrench-screwdriver"
+            icon="i-lucide-wrench-screwdriver"
             label="Administrar"
             size="sm"
           />
@@ -182,7 +182,7 @@ const handleCreate = async () => {
             color="neutral"
             variant="ghost"
             block
-            icon="i-heroicons-eye"
+            icon="i-lucide-eye"
             label="Ver página pública"
             size="sm"
           />
@@ -220,7 +220,7 @@ const handleCreate = async () => {
             v-if="createError"
             color="error"
             variant="soft"
-            icon="i-heroicons-exclamation-circle"
+            icon="i-lucide-circle-alert"
             :description="createError"
           />
           <div class="flex justify-end gap-3 pt-2">
@@ -242,7 +242,7 @@ const handleCreate = async () => {
             v-if="deleteError"
             color="error"
             variant="soft"
-            icon="i-heroicons-exclamation-circle"
+            icon="i-lucide-circle-alert"
             :description="deleteError"
           />
           <div class="flex justify-end gap-3 pt-2">

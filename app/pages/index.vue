@@ -23,7 +23,7 @@ const filteredSubjects = computed(() => {
     <!-- Hero Section -->
     <div class="relative overflow-hidden bg-ink-950 py-24 sm:py-32 isolate">
       <!-- Dark Graph Paper Pattern -->
-      <div class="absolute inset-0 -z-10 bg-[radial-gradient(#1e243d_1px,transparent_1px)] [background-size:16px_16px] opacity-70" aria-hidden="true" />
+      <div class="absolute inset-0 -z-10 bg-[radial-gradient(#1e243d_1px,transparent_1px)] bg-size-[16px_16px] opacity-70" aria-hidden="true" />
 
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
         <div class="mx-auto max-w-2xl text-center">
@@ -39,7 +39,7 @@ const filteredSubjects = computed(() => {
           <div class="mt-10 max-w-xl mx-auto relative dark">
             <UInput 
               v-model="searchQuery"
-              icon="i-heroicons-magnifying-glass-20-solid" 
+              icon="i-lucide-search" 
               size="xl" 
               placeholder="Buscar por nombre o código de asignatura..." 
               :ui="{
@@ -52,7 +52,7 @@ const filteredSubjects = computed(() => {
                   v-show="searchQuery !== ''"
                   color="info"
                   variant="link"
-                  icon="i-heroicons-x-mark-20-solid"
+                  icon="i-lucide-x"
                   :padded="false"
                   @click="searchQuery = ''"
                 />
@@ -76,12 +76,12 @@ const filteredSubjects = computed(() => {
       </div>
 
       <div v-else-if="subjects?.length === 0" class="text-center py-12">
-        <UIcon name="i-heroicons-book-open" class="text-4xl text-muted mb-4 mx-auto" />
+        <UIcon name="i-lucide-book-open" class="text-4xl text-muted mb-4 mx-auto" />
         <p class="text-muted">Aún no hay asignaturas registradas para este semestre.</p>
       </div>
 
       <div v-else-if="filteredSubjects?.length === 0" class="text-center py-12">
-        <UIcon name="i-heroicons-magnifying-glass" class="text-4xl text-muted mb-4 mx-auto" />
+        <UIcon name="i-lucide-search" class="text-4xl text-muted mb-4 mx-auto" />
         <p class="text-muted">No se encontraron asignaturas que coincidan con "{{ searchQuery }}".</p>
         <UButton color="neutral" variant="soft" class="mt-4" @click="searchQuery = ''">Limpiar búsqueda</UButton>
       </div>
@@ -90,7 +90,7 @@ const filteredSubjects = computed(() => {
         v-else-if="error"
         color="error"
         variant="soft"
-        icon="i-heroicons-exclamation-triangle"
+        icon="i-lucide-triangle-alert"
         title="No se pudieron cargar las asignaturas."
         class="max-w-2xl mx-auto"
       >
@@ -131,7 +131,7 @@ const filteredSubjects = computed(() => {
             
             <div class="flex items-center text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
               Ver detalles 
-              <UIcon name="i-heroicons-arrow-right-20-solid" class="ml-1 size-4" />
+              <UIcon name="i-lucide-arrow-right" class="ml-1 size-4" />
             </div>
           </UCard>
         </NuxtLink>

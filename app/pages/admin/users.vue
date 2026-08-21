@@ -164,7 +164,7 @@ const handleConfirmDelete = async () => {
         <h1 class="text-3xl font-bold tracking-tight text-highlighted font-display">Gestionar Ayudantes</h1>
         <p class="mt-2 text-muted">Crear cuentas, activar/desactivar accesos, asignar asignaturas y gestionar roles.</p>
       </div>
-      <UButton color="primary" icon="i-heroicons-plus" label="Crear ayudante" @click="showCreate = true" />
+      <UButton color="primary" icon="i-lucide-plus" label="Crear ayudante" @click="showCreate = true" />
     </div>
 
     <!-- Main Alert Error -->
@@ -172,7 +172,7 @@ const handleConfirmDelete = async () => {
       v-if="error"
       color="error"
       variant="soft"
-      icon="i-heroicons-exclamation-triangle"
+      icon="i-lucide-triangle-alert"
       title="No se pudieron cargar los usuarios."
       class="mb-6"
     >
@@ -191,10 +191,10 @@ const handleConfirmDelete = async () => {
 
     <!-- Empty State -->
     <div v-else-if="!users?.length" class="text-center py-16 bg-muted/30 rounded-2xl border border-dashed border-muted">
-      <UIcon name="i-heroicons-users" class="text-4xl text-muted mb-4 mx-auto" />
+      <UIcon name="i-lucide-users" class="text-4xl text-muted mb-4 mx-auto" />
       <h3 class="text-lg font-semibold text-highlighted mb-2">No hay ayudantes registrados</h3>
       <p class="text-muted max-w-sm mx-auto mb-4">Crea la primera cuenta de ayudante para comenzar.</p>
-      <UButton color="primary" icon="i-heroicons-plus" label="Crear ayudante" @click="showCreate = true" />
+      <UButton color="primary" icon="i-lucide-plus" label="Crear ayudante" @click="showCreate = true" />
     </div>
 
     <!-- Users List -->
@@ -257,7 +257,7 @@ const handleConfirmDelete = async () => {
             :color="u.isActive === false ? 'success' : 'warning'"
             variant="ghost"
             size="sm"
-            :icon="u.isActive === false ? 'i-heroicons-check-circle' : 'i-heroicons-no-symbol'"
+            :icon="u.isActive === false ? 'i-lucide-circle-check' : 'i-lucide-ban'"
             :loading="togglingId === u.id"
             :title="u.isActive === false ? 'Activar cuenta' : 'Desactivar cuenta'"
             @click="promptToggleStatus(u)"
@@ -270,7 +270,7 @@ const handleConfirmDelete = async () => {
             color="neutral"
             variant="ghost"
             size="sm"
-            icon="i-heroicons-pencil-square"
+            icon="i-lucide-square-pen"
             title="Editar usuario"
             @click="openEdit(u)"
           />
@@ -281,7 +281,7 @@ const handleConfirmDelete = async () => {
             color="error"
             variant="ghost"
             size="sm"
-            icon="i-heroicons-trash"
+            icon="i-lucide-trash"
             title="Eliminar usuario permanentemente"
             @click="promptDelete(u)"
           />
@@ -316,7 +316,7 @@ const handleConfirmDelete = async () => {
             v-if="createError"
             color="error"
             variant="soft"
-            icon="i-heroicons-exclamation-circle"
+            icon="i-lucide-circle-alert"
             :description="createError"
           />
           <div class="flex justify-end gap-3 pt-2">
@@ -388,7 +388,7 @@ const handleConfirmDelete = async () => {
             v-if="editError"
             color="error"
             variant="soft"
-            icon="i-heroicons-exclamation-circle"
+            icon="i-lucide-circle-alert"
             :description="editError"
           />
 
@@ -425,7 +425,7 @@ const handleConfirmDelete = async () => {
             v-if="statusActionError"
             color="error"
             variant="soft"
-            icon="i-heroicons-exclamation-circle"
+            icon="i-lucide-circle-alert"
             :description="statusActionError"
           />
 
@@ -458,7 +458,7 @@ const handleConfirmDelete = async () => {
             v-if="deleteError"
             color="error"
             variant="soft"
-            icon="i-heroicons-exclamation-circle"
+            icon="i-lucide-circle-alert"
             :description="deleteError"
           />
 

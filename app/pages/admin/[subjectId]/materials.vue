@@ -133,7 +133,7 @@ const remove = async (material: Material) => {
               size="xs"
               :variant="mode === 'file' ? 'solid' : 'ghost'"
               :color="mode === 'file' ? 'primary' : 'neutral'"
-              icon="i-heroicons-paper-clip"
+              icon="i-lucide-paper-clip"
               label="Subir Archivo"
               @click="mode = 'file'"
             />
@@ -141,7 +141,7 @@ const remove = async (material: Material) => {
               size="xs"
               :variant="mode === 'url' ? 'solid' : 'ghost'"
               :color="mode === 'url' ? 'primary' : 'neutral'"
-              icon="i-heroicons-link"
+              icon="i-lucide-link"
               label="Enlace Externo"
               @click="mode = 'url'"
             />
@@ -167,7 +167,7 @@ const remove = async (material: Material) => {
           >
             <div class="flex flex-col items-center gap-2">
               <div class="p-3 rounded-full bg-primary/10 text-primary">
-                <UIcon name="i-heroicons-cloud-arrow-up" class="size-6" />
+                <UIcon name="i-lucide-cloud-arrow-up" class="size-6" />
               </div>
               <p class="text-sm font-semibold text-default">
                 Haz clic para seleccionar o subir un archivo
@@ -184,7 +184,7 @@ const remove = async (material: Material) => {
           >
             <div class="flex items-center gap-3 overflow-hidden">
               <div class="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
-                <UIcon name="i-heroicons-document" class="size-5" />
+                <UIcon name="i-lucide-document" class="size-5" />
               </div>
               <div class="truncate">
                 <p class="text-sm font-medium text-default truncate">{{ selectedFile.name }}</p>
@@ -194,7 +194,7 @@ const remove = async (material: Material) => {
             <UButton
               color="error"
               variant="ghost"
-              icon="i-heroicons-x-mark"
+              icon="i-lucide-x"
               size="xs"
               @click="clearSelectedFile"
             />
@@ -223,7 +223,7 @@ const remove = async (material: Material) => {
           <UButton
             type="submit"
             color="primary"
-            icon="i-heroicons-arrow-up-tray"
+            icon="i-lucide-arrow-up-tray"
             :label="mode === 'file' ? 'Subir y Guardar' : 'Agregar enlace'"
             :loading="uploading"
           />
@@ -237,7 +237,7 @@ const remove = async (material: Material) => {
         v-if="error"
         color="error"
         variant="soft"
-        icon="i-heroicons-exclamation-triangle"
+        icon="i-lucide-triangle-alert"
         title="No se pudieron cargar los materiales."
         class="mb-6"
       >
@@ -269,7 +269,7 @@ const remove = async (material: Material) => {
           <div class="flex-1">
             <div class="flex items-start gap-3 mb-2">
               <div class="p-2 rounded-lg bg-secondary/10 text-secondary shrink-0">
-                <UIcon name="i-heroicons-document-text" class="size-5" />
+                <UIcon name="i-lucide-file-text" class="size-5" />
               </div>
               <h3 class="font-bold text-default line-clamp-2">{{ material.title }}</h3>
             </div>
@@ -284,14 +284,14 @@ const remove = async (material: Material) => {
               target="_blank"
               color="secondary"
               variant="soft"
-              icon="i-heroicons-arrow-top-right-on-square"
+              icon="i-lucide-external-link"
               label="Abrir archivo"
               size="sm"
             />
             <UButton
               color="error"
               variant="ghost"
-              icon="i-heroicons-trash"
+              icon="i-lucide-trash"
               :loading="deletingId === material.id"
               aria-label="Eliminar material"
               size="sm"

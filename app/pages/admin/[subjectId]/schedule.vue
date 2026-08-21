@@ -129,7 +129,7 @@ async function removeSession(session: Session) {
       <h2 class="text-2xl font-bold text-highlighted">Horario Semanal</h2>
       <UButton
         color="primary"
-        icon="i-heroicons-plus"
+        icon="i-lucide-plus"
         label="Nueva sesión"
         @click="openNew"
       />
@@ -139,7 +139,7 @@ async function removeSession(session: Session) {
       v-if="error"
       color="error"
       variant="soft"
-      icon="i-heroicons-exclamation-triangle"
+      icon="i-lucide-triangle-alert"
       title="No se pudo cargar el horario."
       class="mb-6"
     >
@@ -203,7 +203,7 @@ async function removeSession(session: Session) {
       <!-- Sesiones extraordinarias -->
       <section>
         <div class="flex items-center gap-3 mb-4">
-          <UIcon name="i-heroicons-star" class="text-xl text-warning" />
+          <UIcon name="i-lucide-star" class="text-xl text-warning" />
           <h3 class="text-lg font-bold text-highlighted">Sesiones Extraordinarias</h3>
         </div>
 

@@ -32,7 +32,7 @@ const sortedRecurringSessions = computed(() => {
       v-if="error"
       color="error"
       variant="soft"
-      icon="i-heroicons-exclamation-triangle"
+      icon="i-lucide-triangle-alert"
       title="No se pudo cargar el horario."
     >
       <template #description>
@@ -47,7 +47,7 @@ const sortedRecurringSessions = computed(() => {
       <!-- Horarios Recurrentes -->
       <section>
         <div class="flex items-center gap-3 mb-6">
-          <UIcon name="i-heroicons-arrow-path-rounded-square" class="text-2xl text-primary" />
+          <UIcon name="i-lucide-refresh-cw" class="text-2xl text-primary" />
           <h2 class="text-2xl font-bold text-highlighted">Horarios Semanales</h2>
         </div>
 
@@ -73,7 +73,7 @@ const sortedRecurringSessions = computed(() => {
             <h3 class="font-semibold text-default mb-2">{{ session.title }}</h3>
 
             <div v-if="session.location" class="flex items-center gap-2 text-sm text-muted">
-              <UIcon name="i-heroicons-map-pin" class="size-4" />
+              <UIcon name="i-lucide-map-pin" class="size-4" />
               {{ session.location }}
             </div>
           </UCard>
@@ -83,7 +83,7 @@ const sortedRecurringSessions = computed(() => {
       <!-- Sesiones Extraordinarias -->
       <section>
         <div class="flex items-center gap-3 mb-6">
-          <UIcon name="i-heroicons-star" class="text-2xl text-warning" />
+          <UIcon name="i-lucide-star" class="text-2xl text-warning" />
           <h2 class="text-2xl font-bold text-highlighted">Sesiones Extraordinarias</h2>
         </div>
 
@@ -106,18 +106,18 @@ const sortedRecurringSessions = computed(() => {
                 <h3 class="font-bold text-lg text-default">{{ session.title }}</h3>
                 <div class="flex items-center gap-4 mt-2 text-sm text-muted">
                   <div v-if="session.date" class="flex items-center gap-1.5">
-                    <UIcon name="i-heroicons-calendar-days" class="size-4" />
+                    <UIcon name="i-lucide-calendar-days" class="size-4" />
                     <span class="capitalize">{{ formatFullDate(session.date) }}</span>
                   </div>
                   <div class="flex items-center gap-1.5">
-                    <UIcon name="i-heroicons-clock" class="size-4" />
+                    <UIcon name="i-lucide-clock" class="size-4" />
                     {{ session.startTime }} - {{ session.endTime }}
                   </div>
                 </div>
               </div>
 
               <div v-if="session.location" class="flex items-center gap-1.5 text-sm font-medium bg-muted/10 px-3 py-1.5 rounded-lg text-default self-start sm:self-auto">
-                <UIcon name="i-heroicons-map-pin" class="size-4 text-warning" />
+                <UIcon name="i-lucide-map-pin" class="size-4 text-warning" />
                 {{ session.location }}
               </div>
             </div>

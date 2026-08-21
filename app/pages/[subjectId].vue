@@ -9,17 +9,17 @@ const { data: subject, status, error } = await useFetch(
 const links = computed(() => [
   {
     label: 'Anuncios',
-    icon: 'i-heroicons-megaphone',
+    icon: 'i-lucide-megaphone',
     to: `/${subjectId.value}`,
   },
   {
     label: 'Materiales',
-    icon: 'i-heroicons-folder',
+    icon: 'i-lucide-folder',
     to: `/${subjectId.value}/materials`,
   },
   {
     label: 'Horario',
-    icon: 'i-heroicons-calendar',
+    icon: 'i-lucide-calendar',
     to: `/${subjectId.value}/schedule`,
   },
 ])
@@ -35,7 +35,7 @@ const links = computed(() => [
             to="/"
             color="neutral"
             variant="ghost"
-            icon="i-heroicons-arrow-left"
+            icon="i-lucide-arrow-left"
             aria-label="Volver al inicio"
           />
 
@@ -67,7 +67,7 @@ const links = computed(() => [
         v-if="error"
         color="error"
         variant="soft"
-        icon="i-heroicons-exclamation-triangle"
+        icon="i-lucide-triangle-alert"
         title="No se pudo cargar esta asignatura."
         :description="error.statusMessage ?? 'Intenta nuevamente en unos instantes.'"
       />
