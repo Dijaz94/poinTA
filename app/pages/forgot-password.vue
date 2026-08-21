@@ -12,25 +12,26 @@ watch(user, (currentUser) => {
 }, { immediate: true })
 
 const email = ref('')
-const password = ref('')
 const loading = ref(false)
 const errorMsg = ref('')
+const successMsg = ref('')
 
-const handleLogin = async () => {
+const handleReset = async () => {
   try {
     loading.value = true
     errorMsg.value = ''
+    successMsg.value = ''
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email: email.value,
-      password: password.value,
+    const { error } = await supabase.auth.resetPasswordForEmail(email.value, {
+      redirectTo: `${window.location.origin}/update-password`,
     })
 
-    if (authError) throw authError
+    if (error) throw error
 
-    // La navegación será manejada por el watch sobre `user` una vez que la sesión esté lista
+    successMsg.value = 'Revisa tu bandeja de entrada. Te hemos enviado un enlace para recuperar tu contraseña.'
   } catch (e: any) {
-    errorMsg.value = 'Credenciales incorrectas. Revisa tu correo y contraseña.'
+    errorMsg.value = e.message || 'Ocurrió un error al solicitar el restablecimiento.'
+  } finally {
     loading.value = false
   }
 }
@@ -45,35 +46,18 @@ const handleLogin = async () => {
             <div class="mb-3">
               <AppLogo size="lg" :show-text="false" />
             </div>
-            <h2 class="text-2xl font-bold tracking-tight text-highlighted font-display">Portal de Ayudantes</h2>
-            <p class="mt-1 text-sm text-muted">Ingresa tus credenciales para administrar la plataforma</p>
+            <h2 class="text-2xl font-bold tracking-tight text-highlighted font-display">Recuperar Contraseña</h2>
+            <p class="mt-1 text-sm text-muted">Ingresa tu correo para recibir un enlace de recuperación</p>
           </div>
         </template>
 
-        <form class="space-y-6" @submit.prevent="handleLogin">
+        <form v-if="!successMsg" class="space-y-6" @submit.prevent="handleReset">
           <UFormField label="Correo electrónico" name="email">
             <UInput
               v-model="email"
               type="email"
               icon="i-lucide-mail"
               placeholder="tu@correo.cl"
-              required
-              class="w-full"
-            />
-          </UFormField>
-
-          <UFormField label="Contraseña" name="password">
-            <div class="flex items-center justify-between w-full mb-1">
-              <label class="text-sm font-medium text-default"></label>
-              <NuxtLink to="/forgot-password" class="text-xs font-medium text-primary hover:underline">
-                ¿Olvidaste tu contraseña?
-              </NuxtLink>
-            </div>
-            <UInput
-              v-model="password"
-              type="password"
-              icon="i-lucide-lock"
-              placeholder="••••••••"
               required
               class="w-full"
             />
@@ -93,14 +77,23 @@ const handleLogin = async () => {
             block
             :loading="loading"
           >
-            Iniciar Sesión
+            Enviar enlace
           </UButton>
         </form>
 
+        <div v-else class="space-y-6 text-center">
+          <UIcon name="i-lucide-mail-check" class="text-5xl text-success mx-auto" />
+          <UAlert
+            color="success"
+            variant="soft"
+            :description="successMsg"
+          />
+        </div>
+
         <template #footer>
           <div class="text-center">
-            <UButton to="/" variant="link" color="neutral" size="sm" icon="i-lucide-arrow-left">
-              Volver a la vista de estudiantes
+            <UButton to="/login" variant="link" color="neutral" size="sm" icon="i-lucide-arrow-left">
+              Volver al inicio de sesión
             </UButton>
           </div>
         </template>
