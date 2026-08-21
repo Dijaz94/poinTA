@@ -23,5 +23,9 @@
     <main>
       <slot />
     </main>
+    <footer class="bg-ink-900 border-t border-ink-800 bottom-0 z-50">
+      <p class="text-ink-200 text-center pt-6 text-sm">PoinTA 2026  </p>
+      <p class="text-ink-200 text-center pb-6 text-sm">&copy; Desarrollado por Diego Álvarez Aravena</p>
+    </footer>
   </div>
 </template>

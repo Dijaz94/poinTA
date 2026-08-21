@@ -1,16 +1,29 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import type { Subject } from '~/types/subjects'
+
 const { data: subjects, status, error, refresh } = await useFetch<Subject[]>('/api/subjects')
+
+const searchQuery = ref('')
+
+const filteredSubjects = computed(() => {
+  if (!subjects.value) return []
+  if (!searchQuery.value) return subjects.value
+  
+  const query = searchQuery.value.toLowerCase()
+  return subjects.value.filter(subject => 
+    subject.name.toLowerCase().includes(query) || 
+    subject.code?.toLowerCase().includes(query)
+  )
+})
 </script>
 
 <template>
   <div class="min-h-screen bg-default">
     <!-- Hero Section -->
-    <div class="relative overflow-hidden bg-ink-950 py-24 sm:py-32">
-      <!-- Radial glow: indigo → teal -->
-      <div class="absolute inset-0 -z-10" aria-hidden="true">
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-gradient-to-tr from-indigo-700 via-teal-600 to-transparent opacity-30 blur-3xl" />
-      </div>
+    <div class="relative overflow-hidden bg-ink-950 py-24 sm:py-32 isolate">
+      <!-- Dark Graph Paper Pattern -->
+      <div class="absolute inset-0 -z-10 bg-[radial-gradient(#1e243d_1px,transparent_1px)] [background-size:16px_16px] opacity-70" aria-hidden="true" />
 
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
         <div class="mx-auto max-w-2xl text-center">
@@ -21,13 +34,42 @@ const { data: subjects, status, error, refresh } = await useFetch<Subject[]>('/a
           <p class="mt-6 text-lg leading-8 text-ink-200">
             Encuentra todo el material, anuncios y horarios de las sesiones de ayudantía para tus asignaturas, organizado en un solo lugar.
           </p>
+          
+          <!-- Search Input -->
+          <div class="mt-10 max-w-xl mx-auto relative dark">
+            <UInput 
+              v-model="searchQuery"
+              icon="i-heroicons-magnifying-glass-20-solid" 
+              size="xl" 
+              placeholder="Buscar por nombre o código de asignatura..." 
+              :ui="{
+                root: 'text-left',
+                base: 'bg-ink-900 border-ink-800 focus:border-teal-500 text-white placeholder-ink-400 transition-colors shadow-none rounded-xl'
+              }"
+            >
+              <template #trailing>
+                <UButton
+                  v-show="searchQuery !== ''"
+                  color="info"
+                  variant="link"
+                  icon="i-heroicons-x-mark-20-solid"
+                  :padded="false"
+                  @click="searchQuery = ''"
+                />
+              </template>
+            </UInput>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Subjects Grid -->
     <div class="mx-auto max-w-7xl px-6 lg:px-8 py-16">
-      <h2 class="text-2xl font-bold text-default mb-8">Selecciona tu Asignatura</h2>
+      <div class="flex items-center justify-between mb-8">
+        <h2 class="text-2xl font-bold text-default">
+          {{ searchQuery ? 'Resultados de Búsqueda' : 'Selecciona tu Asignatura' }}
+        </h2>
+      </div>
       
       <div v-if="status === 'pending'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <USkeleton v-for="i in 3" :key="i" class="h-32 w-full rounded-xl" />
@@ -36,6 +78,12 @@ const { data: subjects, status, error, refresh } = await useFetch<Subject[]>('/a
       <div v-else-if="subjects?.length === 0" class="text-center py-12">
         <UIcon name="i-heroicons-book-open" class="text-4xl text-muted mb-4 mx-auto" />
         <p class="text-muted">Aún no hay asignaturas registradas para este semestre.</p>
+      </div>
+
+      <div v-else-if="filteredSubjects?.length === 0" class="text-center py-12">
+        <UIcon name="i-heroicons-magnifying-glass" class="text-4xl text-muted mb-4 mx-auto" />
+        <p class="text-muted">No se encontraron asignaturas que coincidan con "{{ searchQuery }}".</p>
+        <UButton color="neutral" variant="soft" class="mt-4" @click="searchQuery = ''">Limpiar búsqueda</UButton>
       </div>
 
       <UAlert
@@ -56,7 +104,7 @@ const { data: subjects, status, error, refresh } = await useFetch<Subject[]>('/a
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <NuxtLink 
-          v-for="subject in subjects" 
+          v-for="subject in filteredSubjects" 
           :key="subject.id"
           :to="`/${subject.id}`"
           class="group relative"
