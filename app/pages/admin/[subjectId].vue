@@ -8,69 +8,12 @@ const { data: subject, status, error } = await useFetch(
   () => `/api/subjects/${subjectId.value}`,
 )
 
-const links = computed(() => [
-  {
-    label: 'Anuncios',
-    icon: 'i-lucide-megaphone',
-    to: `/admin/${subjectId.value}/announcements`,
-  },
-  {
-    label: 'Materiales',
-    icon: 'i-lucide-folder',
-    to: `/admin/${subjectId.value}/materials`,
-  },
-  {
-    label: 'Horario',
-    icon: 'i-lucide-calendar-days',
-    to: `/admin/${subjectId.value}/schedule`,
-  },
-])
+
 </script>
 
 <template>
   <div class="flex flex-col">
-    <header class="bg-elevated border-b border-muted sticky top-16 z-40">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        <div class="flex items-center gap-4">
-          <UButton
-            to="/admin"
-            color="neutral"
-            variant="ghost"
-            icon="i-lucide-arrow-left"
-            aria-label="Volver al dashboard"
-          />
-
-          <div v-if="status === 'pending'" class="flex items-center gap-3">
-            <USkeleton class="h-6 w-32" />
-            <USkeleton class="h-5 w-16" />
-          </div>
-
-          <div v-else-if="subject" class="flex items-center gap-3">
-            <h1 class="text-xl font-bold text-highlighted truncate max-w-[220px] sm:max-w-md font-display">
-              {{ subject.name }}
-            </h1>
-            <UBadge color="neutral" variant="subtle" size="sm" class="hidden sm:inline-flex">
-              {{ subject.code }}
-            </UBadge>
-          </div>
-        </div>
-
-        <UButton
-          v-if="subject"
-          :to="`/${subject.id}`"
-          color="secondary"
-          variant="soft"
-          size="sm"
-          icon="i-lucide-eye"
-          label="Ver público"
-          class="hidden sm:inline-flex"
-        />
-      </div>
-
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <UNavigationMenu :items="links" class="border-b-0" />
-      </div>
-    </header>
+    <SubjectHeader :subject-id="subjectId" :subject="subject" :status="status" is-admin />
 
     <main class="flex-1 w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
       <UAlert

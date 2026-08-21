@@ -6,6 +6,7 @@ const props = withDefaults(
     session: Session
     variant?: 'kanban' | 'extraordinary'
     deleting?: boolean
+    isAdmin?: boolean
   }>(),
   {
     variant: 'kanban',
@@ -43,7 +44,7 @@ const emit = defineEmits<{
             </span>
           </div>
         </div>
-        <div class="flex gap-1 shrink-0">
+        <div v-if="isAdmin" class="flex gap-1 shrink-0">
           <UButton
             color="neutral"
             variant="ghost"
@@ -68,7 +69,7 @@ const emit = defineEmits<{
     <template v-else>
       <div class="flex flex-col items-start justify-between gap-2">
         <span class="font-semibold text-default line-clamp-1">{{ session.title }}</span>
-        <div class="flex gap-0.5 shrink-0">
+        <div v-if="isAdmin" class="flex gap-0.5 shrink-0">
           <UButton
             color="neutral"
             variant="ghost"
