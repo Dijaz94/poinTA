@@ -3,4 +3,5 @@ export interface Subject {
     name: string
     code: string | null
     semester: string
+    users?: { id: string; name: string }[]
 }

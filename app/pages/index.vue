@@ -77,6 +77,8 @@ const { data: subjects, status, error, refresh } = await useFetch<Subject[]>('/a
               <h3 class="text-xl font-bold text-highlighted group-hover:text-primary transition-colors">
                 {{ subject.name }}
               </h3>
+              <span v-if="subject.users?.length !== 0 && subject.users?.length !== 1" class="text-sm font-mono text-muted">Ayudantes: {{ subject.users?.map((u) => u.name).join(', ') }}</span>
+              <span v-else-if="subject.users?.length === 1" class="text-sm font-mono text-muted">Ayudante: {{ subject.users?.map((u) => u.name).join(', ') }}</span>
             </div>
             
             <div class="flex items-center text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">

@@ -19,5 +19,5 @@ export default defineEventHandler(async (event) => {
     return user?.subjects ?? []
   }
 
-  return await prisma.subject.findMany({ orderBy: { name: 'asc' } })
+  return await prisma.subject.findMany({ orderBy: { name: 'asc' }, include: { users: { select: { name: true, id: true } } } })
 })
