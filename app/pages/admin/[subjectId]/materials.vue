@@ -595,7 +595,7 @@ const remove = async (material: Material) => {
             No hay unidades creadas aún. Todo el material estará en "Material General".
           </div>
 
-          <div v-else class="space-y-2.5 max-h-[22rem] overflow-y-auto pr-2 custom-scrollbar">
+          <div v-else class="space-y-2.5 max-h-88 overflow-y-auto pr-2 custom-scrollbar">
             <template v-for="root in rootUnits" :key="root.id">
               <!-- Unidad Principal -->
               <div class="flex items-center justify-between p-3 bg-background border border-muted/60 rounded-xl shadow-sm">
