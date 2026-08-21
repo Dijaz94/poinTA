@@ -177,7 +177,7 @@ const handleCreate = async () => {
             :to="`/admin/${subject.id}/announcements`"
             color="primary"
             block
-            icon="i-lucide-wrench-screwdriver"
+            icon="i-lucide-wrench"
             label="Administrar"
             size="sm"
           />
