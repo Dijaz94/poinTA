@@ -447,7 +447,7 @@ const remove = async (material: Material) => {
         v-else-if="materials?.length === 0"
         class="text-center py-12 bg-muted/30 rounded-2xl border border-dashed border-muted"
       >
-        <p class="text-muted">No has subido materiales para esta asignatura.</p>
+        <p class="text-muted">No hay material para esta asignatura aún.</p>
       </div>
 
       <!-- Secciones con títulos y grillas -->
