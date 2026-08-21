@@ -1,4 +1,5 @@
 import { serverSupabaseServiceRole } from '#supabase/server'
+import { findAuthUserByEmail } from '~~/server/utils/supabaseAdmin'
 
 export default defineEventHandler(async (event) => {
   assertAdmin(event)
@@ -24,14 +25,32 @@ export default defineEventHandler(async (event) => {
     user_metadata: { full_name: name },
   })
 
+  let authUserId = data?.user?.id
+
   if (error) {
-    throw createError({ statusCode: 400, statusMessage: error.message })
+    if (error.message.toLowerCase().includes('already') || (error as any).status === 422) {
+      const existingAuth = await findAuthUserByEmail(admin, email)
+      if (existingAuth) {
+        authUserId = existingAuth.id
+        const { error: updateAuthErr } = await admin.auth.admin.updateUserById(existingAuth.id, {
+          password,
+          user_metadata: { full_name: name },
+        })
+        if (updateAuthErr) {
+          throw createError({ statusCode: 400, statusMessage: updateAuthErr.message })
+        }
+      } else {
+        throw createError({ statusCode: 400, statusMessage: error.message })
+      }
+    } else {
+      throw createError({ statusCode: 400, statusMessage: error.message })
+    }
   }
 
   const user = await prisma.user.upsert({
     where: { email },
-    update: { name, role: 'TA' },
-    create: { id: data.user.id, name, email, role: 'TA' },
+    update: { name, role: 'TA', ...(authUserId ? { id: authUserId } : {}) },
+    create: { id: authUserId, name, email, role: 'TA' },
   })
 
   if (subjectIds?.length) {

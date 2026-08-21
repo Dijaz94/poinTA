@@ -1,4 +1,5 @@
 import { serverSupabaseServiceRole } from '#supabase/server'
+import { findAuthUserByEmail } from '~~/server/utils/supabaseAdmin'
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
@@ -70,7 +71,32 @@ export default defineEventHandler(async (event) => {
     const { error: authError } = await admin.auth.admin.updateUserById(id, authUpdates)
     if (authError) {
       if (authError.message === 'User not found') {
-        console.warn(`User ${id} not found in Supabase Auth. Skipping auth update.`)
+        const targetEmail = email ?? user.email
+        const existingAuthUser = await findAuthUserByEmail(admin, targetEmail)
+        if (existingAuthUser) {
+          const { error: updateErr } = await admin.auth.admin.updateUserById(existingAuthUser.id, authUpdates)
+          if (updateErr) {
+            throw createError({ statusCode: 400, statusMessage: `Error al actualizar credenciales: ${updateErr.message}` })
+          }
+        } else {
+          console.warn(`User ${id} not found in Supabase Auth. Re-creating auth record.`)
+          const createPayload: any = {
+            id,
+            email: targetEmail,
+            email_confirm: true,
+            user_metadata: { full_name: name ?? user.name },
+          }
+          if (passwordProvided) {
+            createPayload.password = password
+          }
+          const { error: createAuthError } = await admin.auth.admin.createUser(createPayload)
+          if (createAuthError) {
+            throw createError({
+              statusCode: 400,
+              statusMessage: `Error al re-crear credenciales en Auth: ${createAuthError.message}`,
+            })
+          }
+        }
       } else {
         throw createError({ statusCode: 400, statusMessage: `Error al actualizar credenciales: ${authError.message}` })
       }
@@ -84,7 +110,13 @@ export default defineEventHandler(async (event) => {
     const { error: banError } = await admin.auth.admin.updateUserById(id, { ban_duration })
     if (banError) {
       if (banError.message === 'User not found') {
-        console.warn(`User ${id} not found in Supabase Auth. Skipping ban update.`)
+        const targetEmail = email ?? user.email
+        const existingAuthUser = await findAuthUserByEmail(admin, targetEmail)
+        if (existingAuthUser) {
+          await admin.auth.admin.updateUserById(existingAuthUser.id, { ban_duration })
+        } else {
+          console.warn(`User ${id} not found in Supabase Auth. Skipping ban update.`)
+        }
       } else {
         throw createError({ statusCode: 400, statusMessage: `Error al sincronizar estado en Supabase: ${banError.message}` })
       }

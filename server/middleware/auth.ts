@@ -14,8 +14,9 @@ export default defineEventHandler(async (event) => {
   let pointaUser = null
   if (user && email) {
     const role = adminEmails.includes(email.toLowerCase()) ? 'ADMIN' : 'TA'
-    
-    // Only fetch to check existence or just update role
+
+    // Only look up existing Prisma users — never auto-create.
+    // Users are created explicitly via POST /api/admin/users.
     const existing = await prisma.user.findUnique({ where: { email } })
     if (existing) {
       if (existing.role !== role) {
@@ -26,12 +27,8 @@ export default defineEventHandler(async (event) => {
       } else {
         pointaUser = existing
       }
-    } else {
-      const name = user.user_metadata?.full_name ?? user.user_metadata?.name ?? email.split('@')[0]
-      pointaUser = await prisma.user.create({
-        data: { id: user.id, name, email, role: role as any }
-      })
     }
+    // If no Prisma record exists, pointaUser stays null → assertTa will reject.
   }
 
   event.context.pointaUser = pointaUser
