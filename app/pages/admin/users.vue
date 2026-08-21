@@ -45,6 +45,9 @@ const handleCreate = async () => {
 const showEdit = ref(false)
 const editingUser = ref<User | null>(null)
 const editForm = reactive({
+  name: '',
+  email: '',
+  password: '',
   role: '' as string,
   isActive: true,
   addSubjectIds: [] as { label: string; value: string }[],
@@ -55,6 +58,9 @@ const editError = ref('')
 
 const openEdit = (u: User) => {
   editingUser.value = u
+  editForm.name = u.name ?? ''
+  editForm.email = u.email ?? ''
+  editForm.password = ''
   editForm.role = u.role
   editForm.isActive = u.isActive ?? true
   editForm.addSubjectIds = []
@@ -71,6 +77,9 @@ const handleEdit = async () => {
     await $fetch(`/api/admin/users/${editingUser.value.id}`, {
       method: 'PATCH',
       body: {
+        name: editForm.name,
+        email: editForm.email,
+        password: editForm.password || undefined,
         role: editForm.role,
         isActive: editForm.isActive,
         addSubjectIds: editForm.addSubjectIds.length ? editForm.addSubjectIds.map(s => s.value) : undefined,
@@ -322,6 +331,16 @@ const handleConfirmDelete = async () => {
     <UModal v-model:open="showEdit" :title="`Editar ${editingUser?.name ?? ''}`">
       <template #body>
         <form class="space-y-4" @submit.prevent="handleEdit">
+          <UFormField label="Nombre" name="name" required>
+            <UInput v-model="editForm.name" placeholder="Nombre completo" class="w-full" />
+          </UFormField>
+          <UFormField label="Correo electrónico" name="email" required>
+            <UInput v-model="editForm.email" type="email" placeholder="ayudante@correo.cl" class="w-full" />
+          </UFormField>
+          <UFormField label="Contraseña" name="password">
+            <UInput v-model="editForm.password" type="password" placeholder="Dejar en blanco para mantener actual" class="w-full" />
+          </UFormField>
+          
           <UFormField label="Rol" name="role">
             <USelect
               v-model="editForm.role"

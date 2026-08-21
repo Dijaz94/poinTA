@@ -9,11 +9,14 @@ export default defineEventHandler(async (event) => {
   const currentAdmin = assertAdmin(event)
 
   const body = await readBody(event)
-  const { role, isActive, addSubjectIds, removeSubjectIds } = body as {
+  const { role, isActive, addSubjectIds, removeSubjectIds, name, email, password } = body as {
     role?: 'ADMIN' | 'TA'
     isActive?: boolean
     addSubjectIds?: string[]
     removeSubjectIds?: string[]
+    name?: string
+    email?: string
+    password?: string
   }
 
   const user = await prisma.user.findUnique({ where: { id } })
@@ -32,19 +35,59 @@ export default defineEventHandler(async (event) => {
   }
 
   const updates: any = {}
+  const admin = serverSupabaseServiceRole(event)
 
   if (role) {
     updates.role = role
   }
 
-  if (typeof isActive === 'boolean') {
+  const emailProvided = email !== undefined
+  const passwordProvided = !!password
+  const nameProvided = name !== undefined
+
+  if (nameProvided && name !== user.name) {
+    updates.name = name
+  }
+
+  if (emailProvided && email !== user.email) {
+    updates.email = email
+  }
+
+  // Always attempt to sync Supabase Auth to ensure `user_metadata` and credentials are up to date
+  if (emailProvided || passwordProvided || nameProvided) {
+    const authUpdates: any = {}
+    if (emailProvided) {
+      authUpdates.email = email
+      authUpdates.email_confirm = true
+    }
+    if (passwordProvided) {
+      authUpdates.password = password
+    }
+    if (nameProvided) {
+      authUpdates.user_metadata = { full_name: name }
+    }
+
+    const { error: authError } = await admin.auth.admin.updateUserById(id, authUpdates)
+    if (authError) {
+      if (authError.message === 'User not found') {
+        console.warn(`User ${id} not found in Supabase Auth. Skipping auth update.`)
+      } else {
+        throw createError({ statusCode: 400, statusMessage: `Error al actualizar credenciales: ${authError.message}` })
+      }
+    }
+  }
+
+  if (typeof isActive === 'boolean' && isActive !== user.isActive) {
     updates.isActive = isActive
 
-    const admin = serverSupabaseServiceRole(event)
     const ban_duration = isActive ? 'none' : '876000h'
     const { error: banError } = await admin.auth.admin.updateUserById(id, { ban_duration })
     if (banError) {
-      throw createError({ statusCode: 400, statusMessage: `Error al sincronizar estado en Supabase: ${banError.message}` })
+      if (banError.message === 'User not found') {
+        console.warn(`User ${id} not found in Supabase Auth. Skipping ban update.`)
+      } else {
+        throw createError({ statusCode: 400, statusMessage: `Error al sincronizar estado en Supabase: ${banError.message}` })
+      }
     }
   }
 
