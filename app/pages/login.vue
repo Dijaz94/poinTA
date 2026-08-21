@@ -4,10 +4,12 @@ definePageMeta({ layout: 'default' })
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 
-// Si ya hay sesión, redirigir al dashboard
-if (user.value) {
-  await navigateTo('/admin')
-}
+// Si ya hay sesión, o cuando se inicie, redirigir al dashboard
+watch(user, (currentUser) => {
+  if (currentUser) {
+    return navigateTo('/admin')
+  }
+}, { immediate: true })
 
 const email = ref('')
 const password = ref('')
@@ -26,10 +28,9 @@ const handleLogin = async () => {
 
     if (authError) throw authError
 
-    await navigateTo('/admin')
+    // La navegación será manejada por el watch sobre `user` una vez que la sesión esté lista
   } catch (e: any) {
     errorMsg.value = 'Credenciales incorrectas. Revisa tu correo y contraseña.'
-  } finally {
     loading.value = false
   }
 }

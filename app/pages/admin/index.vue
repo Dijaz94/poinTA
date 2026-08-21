@@ -24,6 +24,42 @@ const { data: allUsers } = await useFetch<User[]>('/api/admin/users', {
 
 const selectedUserIds = ref<string[]>([])
 
+// Delete subject modal
+const showDelete = ref(false)
+const subjectToDelete = ref<Subject | null>(null)
+const deleting = ref(false)
+const deleteError = ref('')
+
+const confirmDelete = (subject: Subject) => {
+  subjectToDelete.value = subject
+  deleteError.value = ''
+  showDelete.value = true
+}
+
+const handleDelete = async () => {
+  if (!subjectToDelete.value) return
+  deleting.value = true
+  deleteError.value = ''
+  try {
+    await $fetch(`/api/admin/subjects/${subjectToDelete.value.id}`, {
+      method: 'DELETE',
+    })
+    showDelete.value = false
+    subjectToDelete.value = null
+    await refresh()
+    useToast().add({
+      title: 'Asignatura eliminada',
+      description: 'La asignatura ha sido eliminada correctamente.',
+      color: 'success',
+      duration: 3000,
+    })
+  } catch (e: any) {
+    deleteError.value = e.data?.statusMessage ?? 'Error al eliminar la asignatura.'
+  } finally {
+    deleting.value = false
+  }
+}
+
 const handleCreate = async () => {
   creating.value = true
   createError.value = ''
@@ -116,7 +152,18 @@ const handleCreate = async () => {
         <div>
           <div class="flex items-center justify-between mb-2">
             <UBadge color="secondary" variant="soft" size="sm">{{ subject.semester }}</UBadge>
-            <span class="text-sm font-mono text-muted">{{ subject.code }}</span>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-mono text-muted">{{ subject.code }}</span>
+              <UButton
+                v-if="isAdmin"
+                color="error"
+                variant="ghost"
+                icon="i-heroicons-trash"
+                size="sm"
+                @click="confirmDelete(subject)"
+                title="Eliminar asignatura"
+              />
+            </div>
           </div>
           <h2 class="text-xl font-bold text-highlighted">{{ subject.name }}</h2>
         </div>
@@ -181,6 +228,28 @@ const handleCreate = async () => {
             <UButton type="submit" color="primary" label="Crear" :loading="creating" />
           </div>
         </form>
+      </template>
+    </UModal>
+
+    <!-- Delete Subject Modal -->
+    <UModal v-model:open="showDelete" :title="`Eliminar ${subjectToDelete?.name}`">
+      <template #body>
+        <div class="space-y-4">
+          <p class="text-sm text-default">
+            ¿Estás seguro de que deseas eliminar esta asignatura? Esta acción eliminará también todos los anuncios, encuestas y votos asociados.
+          </p>
+          <UAlert
+            v-if="deleteError"
+            color="error"
+            variant="soft"
+            icon="i-heroicons-exclamation-circle"
+            :description="deleteError"
+          />
+          <div class="flex justify-end gap-3 pt-2">
+            <UButton color="neutral" variant="ghost" label="Cancelar" @click="showDelete = false" />
+            <UButton color="error" label="Eliminar permanentemente" :loading="deleting" @click="handleDelete" />
+          </div>
+        </div>
       </template>
     </UModal>
   </div>
