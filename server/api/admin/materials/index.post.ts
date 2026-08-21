@@ -7,6 +7,7 @@ export default defineEventHandler(async (event) => {
   const description = (form.get('description') as string)?.trim() || null
   const subjectId = (form.get('subjectId') as string)?.trim()
   const explicitUrl = (form.get('fileUrl') as string)?.trim()
+  const unitId = (form.get('unitId') as string)?.trim() || null
 
   if (!subjectId) {
     throw createError({ statusCode: 400, statusMessage: 'subjectId es requerido.' })
@@ -17,6 +18,13 @@ export default defineEventHandler(async (event) => {
   }
 
   await assertTaCanModify(event, subjectId)
+
+  if (unitId) {
+    const unit = await prisma.unit.findUnique({ where: { id: unitId } })
+    if (!unit || unit.subjectId !== subjectId) {
+      throw createError({ statusCode: 400, statusMessage: 'La unidad seleccionada no es válida.' })
+    }
+  }
 
   let finalUrl = explicitUrl || ''
 
@@ -61,6 +69,14 @@ export default defineEventHandler(async (event) => {
       description,
       fileUrl: finalUrl,
       subjectId,
+      unitId,
+    },
+    include: {
+      unit: {
+        include: {
+          parent: true,
+        },
+      },
     },
   })
 })

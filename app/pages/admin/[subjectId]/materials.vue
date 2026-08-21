@@ -1,26 +1,193 @@
 <script setup lang="ts">
-import type { Material } from '~/types/materials'
+import type { Material, Unit } from '~/types/materials'
 import ModalDeleteMaterial from '~/components/ModalDeleteMaterial.vue'
 
 const route = useRoute()
 const subjectId = computed(() => route.params.subjectId as string)
 const toast = useToast()
-const supabase = useSupabaseClient()
 const overlay = useOverlay()
 const confirmDelete = overlay.create(ModalDeleteMaterial)
+
+const creatingUnit = ref(false)
+const deletingUnitId = ref('')
+const newUnitName = ref('')
+const newUnitParentId = ref('none')
 
 const { data: materials, status, error, refresh } = await useFetch<Material[]>('/api/materials', {
   query: { subjectId },
 })
 
+const { data: units, refresh: refreshUnits } = await useFetch<Unit[]>('/api/units', {
+  query: { subjectId },
+})
+
+const handleCreateUnit = async () => {
+  if (!newUnitName.value.trim()) return
+  
+  creatingUnit.value = true
+  try {
+    await $fetch('/api/admin/units', {
+      method: 'POST',
+      body: {
+        name: newUnitName.value.trim(),
+        subjectId: subjectId.value,
+        parentId: newUnitParentId.value === 'none' ? null : newUnitParentId.value,
+      },
+    })
+    toast.add({ title: 'Unidad creada con éxito.', color: 'success' })
+    newUnitName.value = ''
+    newUnitParentId.value = 'none'
+    
+    // Ejecutar ambos refrescos en paralelo sin bloquear infinitamente
+    refresh()
+    refreshUnits()
+  } catch (e: any) {
+    toast.add({
+      title: e?.data?.statusMessage ?? e?.message ?? 'Error al crear la unidad.',
+      color: 'error',
+    })
+  } finally {
+    creatingUnit.value = false
+  }
+}
+
+const handleDeleteUnit = async (unit: Unit) => {
+  if (!confirm(`¿Eliminar la unidad "${unit.name}"? Los materiales asociados pasarán a "Material General".`)) {
+    return
+  }
+
+  deletingUnitId.value = unit.id
+  try {
+    await $fetch(`/api/admin/units/${unit.id}`, {
+      method: 'DELETE',
+    })
+    toast.add({ title: 'Unidad eliminada.', color: 'success' })
+    refreshUnits()
+    refresh()
+  } catch (e: any) {
+    toast.add({
+      title: e?.data?.statusMessage ?? e?.message ?? 'Error al eliminar la unidad.',
+      color: 'error',
+    })
+  } finally {
+    deletingUnitId.value = ''
+  }
+}
+
 const mode = ref<'file' | 'url'>('file')
 const title = ref('')
 const description = ref('')
 const fileUrl = ref('')
+const selectedUnitId = ref('none')
 const selectedFile = ref<File | null>(null)
 const uploading = ref(false)
 const deletingId = ref('')
 const fileInputRef = ref<HTMLInputElement | null>(null)
+
+const scrollToManageUnits = () => {
+  const el = document.getElementById('gestionar-unidades')
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+}
+
+const rootUnits = computed(() => {
+  return units.value?.filter(u => !u.parentId) || []
+})
+
+const parentOptions = computed(() => {
+  return [
+    { label: 'Ninguna (Unidad principal)', value: 'none' },
+    ...rootUnits.value.map(u => ({ label: `Sub-sección de: ${u.name}`, value: u.id })),
+  ]
+})
+
+const unitOptions = computed(() => {
+  const options = [{ label: 'Material General (Sin unidad)', value: 'none' }]
+  if (!units.value) return options
+
+  const roots = units.value.filter(u => !u.parentId)
+
+  roots.forEach((root) => {
+    options.push({ label: root.name, value: root.id })
+    const children = units.value?.filter(u => u.parentId === root.id) || []
+    children.forEach((child) => {
+      options.push({ label: `↳ ${root.name} / ${child.name}`, value: child.id })
+    })
+  })
+
+  return options
+})
+
+interface SectionGroup {
+  id: string
+  title: string
+  parentTitle?: string
+  isSubUnit?: boolean
+  materials: Material[]
+}
+
+const groupedSections = computed<SectionGroup[]>(() => {
+  if (!materials.value) return []
+
+  const sections: SectionGroup[] = []
+
+  // 1. Material General (sin unidad asignada)
+  const generalMaterials = materials.value.filter(m => !m.unitId || !m.unit)
+  if (generalMaterials.length > 0) {
+    sections.push({
+      id: 'general',
+      title: 'Material General',
+      materials: generalMaterials,
+    })
+  }
+
+  // 2. Unidades jerárquicas
+  if (units.value) {
+    const roots = units.value.filter(u => !u.parentId)
+
+    roots.forEach((root) => {
+      const rootMaterials = materials.value?.filter(m => m.unitId === root.id) || []
+      const subUnits = units.value?.filter(u => u.parentId === root.id) || []
+
+      // Si la unidad raíz tiene materiales directamente
+      if (rootMaterials.length > 0) {
+        sections.push({
+          id: root.id,
+          title: root.name,
+          materials: rootMaterials,
+        })
+      }
+
+      // Si tiene sub-unidades con materiales
+      subUnits.forEach((sub) => {
+        const subMaterials = materials.value?.filter(m => m.unitId === sub.id) || []
+        if (subMaterials.length > 0) {
+          sections.push({
+            id: sub.id,
+            title: sub.name,
+            parentTitle: root.name,
+            isSubUnit: true,
+            materials: subMaterials,
+          })
+        }
+      })
+    })
+  }
+
+  // 3. Fallback: Si un material tiene una unidad que no aparece en units
+  const existingSectionIds = new Set(sections.map(s => s.id))
+  const orphanedMaterials = materials.value.filter(m => m.unitId && !existingSectionIds.has(m.unitId) && m.unit)
+  if (orphanedMaterials.length > 0) {
+    sections.push({
+      id: 'other',
+      title: 'Otros Materiales',
+      materials: orphanedMaterials,
+    })
+  }
+
+  return sections
+})
 
 const onFileChange = (e: Event) => {
   const target = e.target as HTMLInputElement
@@ -28,7 +195,6 @@ const onFileChange = (e: Event) => {
     const file = target.files[0]
     selectedFile.value = file
     if (!title.value.trim()) {
-      // Auto-completar título con el nombre del archivo sin la extensión
       title.value = file.name.replace(/\.[^/.]+$/, '')
     }
   }
@@ -63,6 +229,9 @@ const submit = async () => {
       formData.append('description', description.value.trim())
     }
     formData.append('subjectId', subjectId.value)
+    if (selectedUnitId.value && selectedUnitId.value !== 'none') {
+      formData.append('unitId', selectedUnitId.value)
+    }
 
     if (mode.value === 'file' && selectedFile.value) {
       formData.append('file', selectedFile.value)
@@ -121,30 +290,40 @@ const remove = async (material: Material) => {
 </script>
 
 <template>
-  <div class="space-y-8">
-    <!-- Subir material -->
+  <div class="space-y-10">
+    <!-- Panel Agregar material -->
     <UCard>
       <template #header>
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h2 class="text-lg font-bold text-highlighted">Agregar material</h2>
-          <!-- Selector de Modo: Archivo o URL -->
-          <div class="flex items-center gap-2 bg-muted/40 p-1 rounded-lg border border-muted/50">
+          <div class="flex flex-wrap items-center gap-2">
             <UButton
               size="xs"
-              :variant="mode === 'file' ? 'solid' : 'ghost'"
-              :color="mode === 'file' ? 'primary' : 'neutral'"
-              icon="i-lucide-paper-clip"
-              label="Subir Archivo"
-              @click="mode = 'file'"
+              variant="outline"
+              color="neutral"
+              icon="i-lucide-folder-cog"
+              label="Ir a Unidades"
+              @click="scrollToManageUnits"
             />
-            <UButton
-              size="xs"
-              :variant="mode === 'url' ? 'solid' : 'ghost'"
-              :color="mode === 'url' ? 'primary' : 'neutral'"
-              icon="i-lucide-link"
-              label="Enlace Externo"
-              @click="mode = 'url'"
-            />
+            <!-- Selector de Modo: Archivo o URL -->
+            <div class="flex items-center gap-1 bg-muted/40 p-1 rounded-lg border border-muted/50">
+              <UButton
+                size="xs"
+                :variant="mode === 'file' ? 'solid' : 'ghost'"
+                :color="mode === 'file' ? 'primary' : 'neutral'"
+                icon="i-lucide-paper-clip"
+                label="Subir Archivo"
+                @click="mode = 'file'"
+              />
+              <UButton
+                size="xs"
+                :variant="mode === 'url' ? 'solid' : 'ghost'"
+                :color="mode === 'url' ? 'primary' : 'neutral'"
+                icon="i-lucide-link"
+                label="Enlace Externo"
+                @click="mode = 'url'"
+              />
+            </div>
           </div>
         </div>
       </template>
@@ -211,9 +390,20 @@ const remove = async (material: Material) => {
           />
         </UFormField>
 
-        <UFormField label="Título" name="title">
-          <UInput v-model="title" placeholder="Ej: Guía de ejercicios N°2" class="w-full" />
-        </UFormField>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <UFormField label="Título" name="title">
+            <UInput v-model="title" placeholder="Ej: Guía de ejercicios N°2" class="w-full" />
+          </UFormField>
+
+          <UFormField label="Unidad / Sección" name="unitId">
+            <USelectMenu
+              v-model="selectedUnitId"
+              :items="unitOptions"
+              value-key="value"
+              class="w-full"
+            />
+          </UFormField>
+        </div>
 
         <UFormField label="Descripción (opcional)" name="description">
           <UTextarea v-model="description" placeholder="Breve descripción del material..." class="w-full" :rows="2" />
@@ -231,8 +421,8 @@ const remove = async (material: Material) => {
       </form>
     </UCard>
 
-    <!-- Lista de materiales -->
-    <div>
+    <!-- Lista de materiales organizados por Unidades / Secciones -->
+    <div class="space-y-8">
       <UAlert
         v-if="error"
         color="error"
@@ -260,46 +450,210 @@ const remove = async (material: Material) => {
         <p class="text-muted">No has subido materiales para esta asignatura.</p>
       </div>
 
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <UCard
-          v-for="material in materials"
-          :key="material.id"
-          :ui="{ root: 'flex flex-col h-full border border-muted', body: 'flex flex-col h-full gap-3' }"
+      <!-- Secciones con títulos y grillas -->
+      <div v-else class="space-y-10">
+        <section
+          v-for="section in groupedSections"
+          :key="section.id"
+          class="space-y-4"
         >
-          <div class="flex-1">
-            <div class="flex items-start gap-3 mb-2">
-              <div class="p-2 rounded-lg bg-secondary/10 text-secondary shrink-0">
-                <UIcon name="i-lucide-file-text" class="size-5" />
-              </div>
-              <h3 class="font-bold text-default line-clamp-2">{{ material.title }}</h3>
+          <!-- Título de Sección -->
+          <div class="flex items-center gap-3 border-b border-muted/40 pb-2.5">
+            <div
+              class="p-1.5 rounded-lg shrink-0"
+              :class="section.isSubUnit ? 'bg-secondary/10 text-secondary' : 'bg-primary/10 text-primary'"
+            >
+              <UIcon
+                :name="section.id === 'general' ? 'i-lucide-folder' : (section.isSubUnit ? 'i-lucide-corner-down-right' : 'i-lucide-folder-tree')"
+                class="size-5"
+              />
             </div>
-            <p v-if="material.description" class="text-sm text-muted line-clamp-3 ml-11">
-              {{ material.description }}
-            </p>
+            <div>
+              <div v-if="section.parentTitle" class="text-xs text-muted font-medium">
+                {{ section.parentTitle }}
+              </div>
+              <h3 class="text-lg font-bold text-highlighted">
+                {{ section.title }}
+              </h3>
+            </div>
+            <span class="text-xs text-muted ml-auto bg-muted/40 px-2 py-0.5 rounded-full">
+              {{ section.materials.length }} {{ section.materials.length === 1 ? 'material' : 'materiales' }}
+            </span>
           </div>
 
-          <div class="pt-3 mt-auto border-t border-muted/30 flex items-center justify-between gap-2">
-            <UButton
-              :to="material.fileUrl"
-              target="_blank"
-              color="secondary"
-              variant="soft"
-              icon="i-lucide-external-link"
-              label="Abrir archivo"
-              size="sm"
-            />
-            <UButton
-              color="error"
-              variant="ghost"
-              icon="i-lucide-trash"
-              :loading="deletingId === material.id"
-              aria-label="Eliminar material"
-              size="sm"
-              @click="remove(material)"
-            />
+          <!-- Cuadrícula de materiales para esta sección -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <UCard
+              v-for="material in section.materials"
+              :key="material.id"
+              :ui="{ root: 'flex flex-col h-full border border-muted', body: 'flex flex-col h-full gap-3' }"
+            >
+              <div class="flex-1">
+                <div class="flex items-start gap-3 mb-2">
+                  <div class="p-2 rounded-lg bg-secondary/10 text-secondary shrink-0">
+                    <UIcon name="i-lucide-file-text" class="size-5" />
+                  </div>
+                  <h4 class="font-bold text-default line-clamp-2">{{ material.title }}</h4>
+                </div>
+                <p v-if="material.description" class="text-sm text-muted line-clamp-3 ml-11">
+                  {{ material.description }}
+                </p>
+              </div>
+
+              <div class="pt-3 mt-auto border-t border-muted/30 flex items-center justify-between gap-2">
+                <UButton
+                  :to="material.fileUrl"
+                  target="_blank"
+                  color="secondary"
+                  variant="soft"
+                  icon="i-lucide-external-link"
+                  label="Abrir archivo"
+                  size="sm"
+                />
+                <UButton
+                  color="error"
+                  variant="ghost"
+                  icon="i-lucide-trash"
+                  :loading="deletingId === material.id"
+                  aria-label="Eliminar material"
+                  size="sm"
+                  @click="remove(material)"
+                />
+              </div>
+            </UCard>
           </div>
-        </UCard>
+        </section>
       </div>
     </div>
+
+    <!-- Panel Gestionar Unidades (Siempre visible) -->
+    <UCard
+      id="gestionar-unidades"
+      class="border-primary/20 bg-primary/5 shadow-sm scroll-mt-24"
+    >
+      <template #header>
+        <div class="flex items-center gap-2">
+          <div class="p-1.5 rounded-lg bg-primary/10 text-primary">
+            <UIcon name="i-lucide-folder-tree" class="size-5" />
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-highlighted">Gestionar Unidades y Secciones</h3>
+            <p class="text-xs text-muted">Organiza el contenido de la asignatura en jerarquías.</p>
+          </div>
+        </div>
+      </template>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Columna 1: Formulario para crear unidad -->
+        <div class="space-y-4">
+          <h4 class="text-sm font-semibold text-highlighted flex items-center gap-2">
+            <UIcon name="i-lucide-folder-plus" class="size-4 text-primary" />
+            Nueva Unidad o Sección
+          </h4>
+          
+          <form class="p-4 bg-background border border-muted/50 rounded-xl space-y-4 shadow-sm" @submit.prevent="handleCreateUnit">
+            <div class="space-y-4">
+              <UFormField label="Nombre">
+                <UInput
+                  v-model="newUnitName"
+                  placeholder="Ej: Unidad 1 o Semana 1"
+                  class="w-full"
+                />
+              </UFormField>
+
+              <UFormField label="Jerarquía">
+                <USelect
+                  v-model="newUnitParentId"
+                  :items="parentOptions"
+                  class="w-full"
+                />
+              </UFormField>
+            </div>
+
+            <div class="flex justify-end pt-2">
+              <UButton
+                type="submit"
+                color="primary"
+                size="sm"
+                icon="i-lucide-plus"
+                label="Crear Unidad"
+                :loading="creatingUnit"
+                :disabled="!newUnitName.trim()"
+              />
+            </div>
+          </form>
+        </div>
+
+        <!-- Columna 2: Lista de unidades actuales -->
+        <div class="space-y-4 lg:border-l lg:border-muted/30 lg:pl-8">
+          <h4 class="text-sm font-semibold text-highlighted">Estructura actual</h4>
+
+          <div
+            v-if="!units || units.length === 0"
+            class="text-center py-8 text-muted text-sm bg-background border border-dashed border-muted rounded-xl"
+          >
+            No hay unidades creadas aún. Todo el material estará en "Material General".
+          </div>
+
+          <div v-else class="space-y-2.5 max-h-[22rem] overflow-y-auto pr-2 custom-scrollbar">
+            <template v-for="root in rootUnits" :key="root.id">
+              <!-- Unidad Principal -->
+              <div class="flex items-center justify-between p-3 bg-background border border-muted/60 rounded-xl shadow-sm">
+                <div class="flex items-center gap-2.5">
+                  <UIcon name="i-lucide-folder" class="size-4 text-primary" />
+                  <span class="font-semibold text-sm text-default">{{ root.name }}</span>
+                </div>
+                <UButton
+                  type="button"
+                  color="error"
+                  variant="ghost"
+                  icon="i-lucide-trash"
+                  size="xs"
+                  :loading="deletingUnitId === root.id"
+                  aria-label="Eliminar unidad"
+                  @click="handleDeleteUnit(root)"
+                />
+              </div>
+
+              <!-- Sub-secciones -->
+              <div
+                v-for="child in units.filter(u => u.parentId === root.id)"
+                :key="child.id"
+                class="ml-8 flex items-center justify-between p-2.5 bg-background/50 border border-muted/40 rounded-lg"
+              >
+                <div class="flex items-center gap-2">
+                  <UIcon name="i-lucide-corner-down-right" class="size-3.5 text-muted" />
+                  <UIcon name="i-lucide-file-text" class="size-3.5 text-secondary" />
+                  <span class="text-sm text-default">{{ child.name }}</span>
+                </div>
+                <UButton
+                  type="button"
+                  color="error"
+                  variant="ghost"
+                  icon="i-lucide-trash"
+                  size="xs"
+                  :loading="deletingUnitId === child.id"
+                  aria-label="Eliminar sub-sección"
+                  @click="handleDeleteUnit(child)"
+                />
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </UCard>
   </div>
 </template>
+
+<style scoped>
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--color-muted);
+  border-radius: 20px;
+}
+</style>

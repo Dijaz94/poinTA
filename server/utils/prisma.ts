@@ -6,7 +6,7 @@ const globalForPrisma = globalThis as unknown as {
 }
 
 function getPrismaClient(): PrismaClient {
-  if (globalForPrisma.__prisma) {
+  if (globalForPrisma.__prisma && (globalForPrisma.__prisma as any).unit) {
     return globalForPrisma.__prisma
   }
 

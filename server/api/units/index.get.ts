@@ -6,15 +6,20 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'subjectId es requerido.' })
   }
 
-  return await prisma.material.findMany({
+  return await prisma.unit.findMany({
     where: { subjectId },
+    orderBy: [
+      { order: 'asc' },
+      { createdAt: 'asc' },
+    ],
     include: {
-      unit: {
-        include: {
-          parent: true,
-        },
+      parent: true,
+      children: {
+        orderBy: [
+          { order: 'asc' },
+          { createdAt: 'asc' },
+        ],
       },
     },
-    orderBy: { createdAt: 'desc' },
   })
 })

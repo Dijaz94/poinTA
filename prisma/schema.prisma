@@ -40,6 +40,7 @@ model Subject {
   announcements Announcement[]
   materials     Material[]
   sessions      Session[]
+  units         Unit[]
 }
 
 enum AnnouncementType {
@@ -78,6 +79,19 @@ model Vote {
   @@unique([email, optionId])
 }
 
+model Unit {
+  id        String     @id @default(uuid())
+  name      String
+  order     Int        @default(0)
+  createdAt DateTime   @default(now())
+  subjectId String
+  subject   Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  parentId  String?
+  parent    Unit?      @relation("UnitHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Unit[]     @relation("UnitHierarchy")
+  materials Material[]
+}
+
 model Material {
   id          String   @id @default(uuid())
   title       String
@@ -86,6 +100,8 @@ model Material {
   createdAt   DateTime @default(now())
   subjectId   String
   subject     Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  unitId      String?
+  unit        Unit?    @relation(fields: [unitId], references: [id], onDelete: SetNull)
 }
 
 model Session {
