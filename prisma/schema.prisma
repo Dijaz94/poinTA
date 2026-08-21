@@ -42,13 +42,40 @@ model Subject {
   sessions      Session[]
 }
 
+enum AnnouncementType {
+  COMMUNICATION
+  POLL
+}
+
 model Announcement {
-  id        String   @id @default(uuid())
-  title     String
-  content   String
-  createdAt DateTime @default(now())
-  subjectId String
-  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  id               String           @id @default(uuid())
+  title            String
+  content          String           @default("")
+  type             AnnouncementType @default(COMMUNICATION)
+  deadline         DateTime?
+  authorizedEmails String[]
+  createdAt        DateTime         @default(now())
+  subjectId        String
+  subject          Subject          @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  options          PollOption[]
+}
+
+model PollOption {
+  id             String       @id @default(uuid())
+  label          String
+  announcementId String
+  announcement   Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  votes          Vote[]
+}
+
+model Vote {
+  id        String     @id @default(uuid())
+  email     String
+  optionId  String
+  option    PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  createdAt DateTime   @default(now())
+
+  @@unique([email, optionId])
 }
 
 model Material {

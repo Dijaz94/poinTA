@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Announcement } from '~/types/announcements'
+import PollCard from '~/components/PollCard.vue'
 
 const route = useRoute()
 const subjectId = computed(() => route.params.subjectId as string)
@@ -12,7 +13,10 @@ const { data: announcements, status, error, refresh } = await useFetch<Announcem
 <template>
   <div>
     <div class="flex items-center justify-between mb-8">
-      <h2 class="text-2xl font-bold text-highlighted">Anuncios Recientes</h2>
+      <div>
+        <h2 class="text-2xl font-bold text-highlighted">Anuncios y Votaciones</h2>
+        <p class="text-sm text-muted">Avisos importantes y consultas activas del equipo docente</p>
+      </div>
     </div>
 
     <UAlert
@@ -43,34 +47,49 @@ const { data: announcements, status, error, refresh } = await useFetch<Announcem
 
     <div v-else-if="announcements?.length === 0" class="text-center py-16 bg-muted/30 rounded-2xl border border-dashed border-muted">
       <UIcon name="i-heroicons-megaphone" class="text-4xl text-muted mb-4" />
-      <h3 class="text-lg font-semibold text-highlighted mb-2">No hay anuncios</h3>
+      <h3 class="text-lg font-semibold text-highlighted mb-2">No hay anuncios ni votaciones</h3>
       <p class="text-muted max-w-sm mx-auto">
-        Aún no se han publicado anuncios para esta asignatura. Vuelve a revisar más tarde.
+        Aún no se han publicado avisos para esta asignatura. Vuelve a revisar más tarde.
       </p>
     </div>
 
     <div v-else class="space-y-6">
-      <UCard
-        v-for="announcement in announcements"
-        :key="announcement.id"
-        :ui="{
-          root: 'overflow-hidden border-l-4 border-l-primary',
-          header: 'pb-2 bg-muted/10',
-          body: 'pt-4',
-        }"
-      >
-        <template #header>
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <h3 class="font-bold text-lg text-default">{{ announcement.title }}</h3>
-            <div class="flex items-center gap-1.5 text-xs text-muted whitespace-nowrap">
-              <UIcon name="i-heroicons-clock" class="size-3.5" />
-              {{ formatDateTime(announcement.createdAt) }}
-            </div>
-          </div>
-        </template>
+      <template v-for="announcement in announcements" :key="announcement.id">
+        <!-- Votación -->
+        <PollCard
+          v-if="announcement.type === 'POLL'"
+          :announcement="announcement"
+          @voted="() => refresh()"
+        />
 
-        <p class="text-default whitespace-pre-wrap leading-relaxed">{{ announcement.content }}</p>
-      </UCard>
+        <!-- Comunicado tradicional -->
+        <UCard
+          v-else
+          :ui="{
+            root: 'overflow-hidden border-l-4 border-l-primary',
+            header: 'pb-2 bg-muted/10',
+            body: 'pt-4',
+          }"
+        >
+          <template #header>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <UBadge color="neutral" variant="subtle" size="xs">
+                  <UIcon name="i-heroicons-megaphone" class="size-3 mr-1" />
+                  Comunicado
+                </UBadge>
+                <h3 class="font-bold text-lg text-default">{{ announcement.title }}</h3>
+              </div>
+              <div class="flex items-center gap-1.5 text-xs text-muted whitespace-nowrap">
+                <UIcon name="i-heroicons-clock" class="size-3.5" />
+                {{ formatDateTime(announcement.createdAt) }}
+              </div>
+            </div>
+          </template>
+
+          <p class="text-default whitespace-pre-wrap leading-relaxed">{{ announcement.content }}</p>
+        </UCard>
+      </template>
     </div>
   </div>
 </template>
