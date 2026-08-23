@@ -153,6 +153,7 @@ const handleUploadMaterial = async (data: {
 
     uploadFormRef.value?.resetForm()
     toast.add({ title: 'Material agregado con éxito.', color: 'success' })
+    clearNuxtData()
     await refreshMaterials()
   } catch (e: any) {
     toast.add({
@@ -176,6 +177,7 @@ const handleRemoveMaterial = async (material: Material) => {
   try {
     await $fetch(`/api/admin/materials/${material.id}`, { method: 'DELETE' })
     toast.add({ title: 'Material eliminado.', color: 'success' })
+    clearNuxtData()
     await refreshMaterials()
   } catch (e: any) {
     toast.add({
@@ -205,6 +207,7 @@ const handleCreateUnit = async () => {
     newUnitName.value = ''
     newUnitParentId.value = 'none'
 
+    clearNuxtData()
     refreshMaterials()
     refreshUnits()
   } catch (e: any) {
@@ -228,6 +231,7 @@ const handleDeleteUnit = async (unit: Unit) => {
       method: 'DELETE',
     })
     toast.add({ title: 'Unidad eliminada.', color: 'success' })
+    clearNuxtData()
     refreshUnits()
     refreshMaterials()
   } catch (e: any) {

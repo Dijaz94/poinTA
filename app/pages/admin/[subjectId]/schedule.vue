@@ -67,6 +67,7 @@ async function updateDayOfWeek(id: string, day: string) {
       body: { dayOfWeek: day },
     })
     toast.add({ title: `Sesión movida a ${dayLabel(day)}.`, color: 'success' })
+    clearNuxtData()
   } catch (e: any) {
     toast.add({ title: e?.data?.statusMessage ?? 'No se pudo actualizar el horario.', color: 'error' })
     await refresh()
@@ -163,6 +164,7 @@ async function handleSaveSession() {
       toast.add({ title: 'Sesión creada.', color: 'success' })
     }
     isSessionModalOpen.value = false
+    clearNuxtData()
     await refresh()
   } catch (e: any) {
     toast.add({ title: e?.data?.statusMessage ?? 'No se pudo guardar la sesión.', color: 'error' })
@@ -188,6 +190,7 @@ async function handleRemoveSession(session: Session) {
   try {
     await $fetch(`/api/admin/schedule/${session.id}`, { method: 'DELETE' })
     toast.add({ title: 'Sesión eliminada.', color: 'success' })
+    clearNuxtData()
     await refresh()
   } catch (e: any) {
     toast.add({ title: e?.data?.statusMessage ?? 'No se pudo eliminar.', color: 'error' })

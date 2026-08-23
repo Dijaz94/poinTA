@@ -51,6 +51,7 @@ const handleDelete = async (id: string) => {
   try {
     await $fetch(`/api/admin/announcements/${id}`, { method: 'DELETE' })
     toast.add({ title: 'Anuncio eliminado.', color: 'success' })
+    clearNuxtData()
     await refresh()
   } catch (e: any) {
     toast.add({

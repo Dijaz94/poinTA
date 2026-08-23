@@ -1,25 +1,10 @@
-datasource db {
-  provider = "postgresql"
-}
-
 generator client {
   provider = "prisma-client"
   output   = "../server/generated"
 }
 
-enum Role {
-  ADMIN
-  TA
-}
-
-enum DayOfWeek {
-  MONDAY
-  TUESDAY
-  WEDNESDAY
-  THURSDAY
-  FRIDAY
-  SATURDAY
-  SUNDAY
+datasource db {
+  provider = "postgresql"
 }
 
 model User {
@@ -28,7 +13,7 @@ model User {
   email    String    @unique
   role     Role      @default(TA)
   isActive Boolean   @default(true)
-  subjects Subject[]
+  subjects Subject[] @relation("SubjectToUser")
 
   @@index([id])
 }
@@ -38,29 +23,24 @@ model Subject {
   name          String
   code          String?
   semester      String
-  users         User[]
   announcements Announcement[]
   materials     Material[]
   sessions      Session[]
   units         Unit[]
+  users         User[]         @relation("SubjectToUser")
 
   @@index([id])
-}
-
-enum AnnouncementType {
-  COMMUNICATION
-  POLL
 }
 
 model Announcement {
   id               String           @id @default(uuid())
   title            String
   content          String           @default("")
-  type             AnnouncementType @default(COMMUNICATION)
-  deadline         DateTime?
-  authorizedEmails String[]
   createdAt        DateTime         @default(now())
   subjectId        String
+  authorizedEmails String[]
+  deadline         DateTime?
+  type             AnnouncementType @default(COMMUNICATION)
   subject          Subject          @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   options          PollOption[]
 
@@ -81,8 +61,8 @@ model Vote {
   id        String     @id @default(uuid())
   email     String
   optionId  String
-  option    PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
   createdAt DateTime   @default(now())
+  option    PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
 
   @@unique([email, optionId])
   @@index([id])
@@ -94,11 +74,11 @@ model Unit {
   order     Int        @default(0)
   createdAt DateTime   @default(now())
   subjectId String
-  subject   Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   parentId  String?
+  materials Material[]
   parent    Unit?      @relation("UnitHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
   children  Unit[]     @relation("UnitHierarchy")
-  materials Material[]
+  subject   Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 
   @@index([id])
 }
@@ -110,9 +90,9 @@ model Material {
   fileUrl     String
   createdAt   DateTime @default(now())
   subjectId   String
-  subject     Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   unitId      String?
-  unit        Unit?    @relation(fields: [unitId], references: [id], onDelete: SetNull)
+  subject     Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  unit        Unit?    @relation(fields: [unitId], references: [id])
 
   @@index([id])
 }
@@ -121,13 +101,33 @@ model Session {
   id          String     @id @default(uuid())
   title       String
   isRecurring Boolean    @default(true)
-  dayOfWeek   DayOfWeek?
   date        DateTime?
   startTime   String
   endTime     String
   location    String?
   subjectId   String
+  dayOfWeek   DayOfWeek?
   subject     Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 
   @@index([id])
+}
+
+enum Role {
+  ADMIN
+  TA
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum AnnouncementType {
+  COMMUNICATION
+  POLL
 }
