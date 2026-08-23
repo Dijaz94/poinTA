@@ -5,12 +5,12 @@ const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const toast = useToast()
 
-// Redirigir al login si se accede directamente sin estar logueado (por token de recuperación)
-watch(user, (currentUser) => {
-  if (!currentUser) {
-    return navigateTo('/login')
-  }
-}, { immediate: true })
+// Comentado para evitar que redirija al login antes de que Supabase procese el token en la URL
+// watch(user, (currentUser) => {
+//   if (!currentUser) {
+//     return navigateTo('/login')
+//   }
+// }, { immediate: true })
 
 const newPassword = ref('')
 const confirmPassword = ref('')
