@@ -39,6 +39,9 @@ export default defineNuxtConfig({
     '/': {
       isr: 3600
     },
+    '/api/**': {
+      cache: false,
+    },
     '/**': {
       swr: true
     },
@@ -48,6 +51,5 @@ export default defineNuxtConfig({
     '/login': { ssr: false },
     '/forgot-password': { ssr: false },
     '/update-password': { ssr: false }
-
   }
 })

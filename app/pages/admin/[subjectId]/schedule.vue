@@ -11,9 +11,9 @@ const subjectId = computed(() => route.params.subjectId as string)
 const toast = useToast()
 
 // ─── Datos ───
-const { data: sessions, status, error, refresh } = await useFetch<Session[]>('/api/schedule', {
-  query: { subjectId: subjectId.value },
-})
+const { data: sessions, status, error, refresh } = await useFetch<Session[]>(
+  () => `/api/schedule?subjectId=${subjectId.value}`
+)
 
 const columns = ref<Record<string, Session[]>>({
   MONDAY: [], TUESDAY: [], WEDNESDAY: [],

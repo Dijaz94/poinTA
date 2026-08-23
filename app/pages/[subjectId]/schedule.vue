@@ -7,9 +7,9 @@ import SessionCard from '~/components/SessionCard.vue'
 const route = useRoute()
 const subjectId = computed(() => route.params.subjectId as string)
 
-const { data: sessions, status, error, refresh } = await useFetch<Session[]>('/api/schedule', {
-  query: { subjectId: subjectId.value },
-})
+const { data: sessions, status, error, refresh } = await useFetch<Session[]>(
+  () => `/api/schedule?subjectId=${subjectId.value}`
+)
 
 const columns = computed<Record<string, Session[]>>(() => {
   const map: Record<string, Session[]> = {}

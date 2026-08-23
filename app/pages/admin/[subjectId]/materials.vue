@@ -25,8 +25,8 @@ const [
   { data: materials, status, error, refresh: refreshMaterials },
   { data: units, refresh: refreshUnits }
 ] = await Promise.all([
-  useFetch<Material[]>('/api/materials', { query: { subjectId: subjectId.value } }),
-  useFetch<Unit[]>('/api/units', { query: { subjectId: subjectId.value } })
+  useFetch<Material[]>(() => `/api/materials?subjectId=${subjectId.value}`),
+  useFetch<Unit[]>(() => `/api/units?subjectId=${subjectId.value}`)
 ])
 
 // ─── Unidades Computed Options ───

@@ -7,10 +7,12 @@ const subjectId = computed(() => route.params.subjectId as string)
 const toast = useToast()
 const studentEmailCookie = useCookie<string>('student_email', { default: () => '' })
 
-const { data: announcements, status, error, refresh } = await useFetch('/api/announcements', {
-  query: { subjectId: subjectId.value },
-  transform: (data) => data as Announcement[],
-})
+const { data: announcements, status, error, refresh } = await useFetch(
+  () => `/api/announcements?subjectId=${subjectId.value}`,
+  {
+    transform: (data) => data as Announcement[],
+  }
+)
 
 // ─── Lógica Inlined de Encuestas / Votaciones (Polls) ───
 interface PollState {

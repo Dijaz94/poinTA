@@ -8,10 +8,12 @@ const route = useRoute()
 const subjectId = computed(() => route.params.subjectId as string)
 const toast = useToast()
 
-const { data: announcements, status, error, refresh } = await useFetch('/api/announcements', {
-  query: { subjectId: subjectId.value },
-  transform: (data) => data as Announcement[],
-})
+const { data: announcements, status, error, refresh } = await useFetch(
+  () => `/api/announcements?subjectId=${subjectId.value}`,
+  {
+    transform: (data) => data as Announcement[],
+  }
+)
 
 const submitting = ref(false)
 const deletingId = ref('')
