@@ -2,7 +2,12 @@
 import { computed, ref } from 'vue'
 import type { Subject } from '~/types/subjects'
 
-const { data: subjects, status, error, refresh } = await useFetch<Subject[]>('/api/subjects')
+const { data: subjects, status, error, refresh } = await useFetch<Subject[]>('/api/subjects', {
+  key: 'subjects-index',
+  getCachedData:(key, nuxtApp)=>{
+    return nuxtApp.payload.data[key]
+  },
+})
 
 const searchQuery = ref('')
 
