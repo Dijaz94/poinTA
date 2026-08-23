@@ -44,7 +44,7 @@ export default defineNuxtConfig({
       cache: false,
     },
     '/**': {
-      swr: true
+      cache: false,
     },
     '/admin/**': {
       ssr: false,
