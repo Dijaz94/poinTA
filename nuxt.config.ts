@@ -25,6 +25,9 @@ export default defineNuxtConfig({
     ],
   },
   vite: {
+    define: {
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'true'
+    },
     resolve: {
       alias: {
         axios: '~/stubs/axios.mjs',
