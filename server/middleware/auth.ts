@@ -8,7 +8,12 @@ const adminEmails = (process.env.ADMIN_EMAILS ?? '')
 export default defineEventHandler(async (event) => {
   if (!event.path.startsWith('/api')) return
 
-  const user = await serverSupabaseUser(event)
+  let user = null
+  try {
+    user = await serverSupabaseUser(event)
+  } catch {
+    user = null
+  }
   const email = user?.email ?? user?.user_metadata?.email
 
   let pointaUser = null
