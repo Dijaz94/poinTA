@@ -35,4 +35,19 @@ export default defineNuxtConfig({
       },
     },
   },
+  routeRules: {
+    '/': {
+      isr: 3600
+    },
+    '/**': {
+      swr: true
+    },
+    '/admin/**': {
+      ssr: false,
+    },
+    '/login': { ssr: false },
+    '/forgot-password': { ssr: false },
+    '/update-password': { ssr: false }
+
+  }
 })
