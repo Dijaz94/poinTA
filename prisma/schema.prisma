@@ -101,7 +101,7 @@ model Session {
   id          String     @id @default(uuid())
   title       String
   isRecurring Boolean    @default(true)
-  date        DateTime?
+  date        DateTime?  @db.Date
   startTime   String
   endTime     String
   location    String?
