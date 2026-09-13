@@ -31,7 +31,7 @@ const handleLogout = async () => {
             icon="i-lucide-users"
             label="Usuarios"
             size="sm"
-            class="hidden sm:inline-flex"
+            class="inline-flex"
           />
           <span v-if="user?.email" class="text-sm text-ink-600 dark:text-ink-300 hidden md:inline transition-colors duration-300">{{ user.email }}</span>
           <UButton
