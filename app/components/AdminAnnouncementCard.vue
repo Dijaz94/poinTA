@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Announcement } from '~/types/announcements'
+import { isPollExpired } from '~/utils/poll';
 
 defineProps<{
   announcement: Announcement
@@ -9,11 +10,6 @@ defineProps<{
 const emit = defineEmits<{
   delete: [id: string]
 }>()
-
-const isExpired = (deadlineVal: string | null) => {
-  if (!deadlineVal) return false
-  return new Date() > new Date(deadlineVal)
-}
 </script>
 
 <template>
@@ -37,12 +33,12 @@ const isExpired = (deadlineVal: string | null) => {
 
             <UBadge
               v-if="announcement.type === 'POLL' && announcement.deadline"
-              :color="isExpired(announcement.deadline) ? 'error' : 'warning'"
+              :color="isPollExpired(announcement.deadline) ? 'error' : 'warning'"
               variant="soft"
               size="xs"
             >
               <UIcon name="i-lucide-clock" class="size-3 mr-1" />
-              {{ isExpired(announcement.deadline) ? 'Votación Cerrada' : `Cierra: ${formatDateTime(announcement.deadline)}` }}
+              {{ isPollExpired(announcement.deadline) ? 'Votación Cerrada' : `Cierra: ${formatDateTime(announcement.deadline)}` }}
             </UBadge>
 
             <span class="text-xs text-muted whitespace-nowrap">
@@ -76,31 +72,7 @@ const isExpired = (deadlineVal: string | null) => {
           </span>
         </div>
 
-        <div class="space-y-2.5">
-          <div
-            v-for="opt in announcement.options"
-            :key="opt.id"
-            class="space-y-1 bg-muted/20 p-2.5 rounded-lg border border-muted/40"
-          >
-            <div class="flex items-center justify-between text-sm">
-              <span class="font-medium text-default">{{ opt.label }}</span>
-              <span class="text-xs font-bold text-muted">
-                {{ opt.voteCount }} {{ opt.voteCount === 1 ? 'voto' : 'votos' }}
-                ({{ (announcement.totalVotes ?? 0) > 0 ? Math.round((opt.voteCount / (announcement.totalVotes || 1)) * 100) : 0 }}%)
-              </span>
-            </div>
-
-            <!-- Barra de progreso -->
-            <div class="w-full bg-muted/50 rounded-full h-2 overflow-hidden">
-              <div
-                class="bg-primary h-2 rounded-full transition-all duration-500"
-                :style="{
-                  width: `${(announcement.totalVotes ?? 0) > 0 ? Math.round((opt.voteCount / (announcement.totalVotes || 1)) * 100) : 0}%`
-                }"
-              />
-            </div>
-          </div>
-        </div>
+        <PollResults :options="announcement.options" :total-votes="announcement.totalVotes" size="sm" />
       </div>
     </div>
   </UCard>
