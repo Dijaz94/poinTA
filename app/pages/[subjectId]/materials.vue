@@ -203,20 +203,25 @@ function formatCardIndex(sectionCode: string, idx: number): string {
       <!-- Buscador Local de Materiales -->
       <div v-if="materials && materials.length > 0" class="w-full sm:w-72">
         <label for="material-filter-input" class="sr-only">Filtrar materiales por título o descripción</label>
-        <div class="relative flex items-center rounded-[6px] border border-[var(--atelier-border)] bg-[var(--atelier-surface)] focus-within:border-[var(--atelier-cobalt)] transition-colors">
-          <UIcon name="i-lucide-search" class="size-4 text-muted ml-3 shrink-0" />
+        <div class="relative flex items-center rounded-[6px] border border-[var(--atelier-border)] bg-[var(--atelier-surface)] focus-within:border-[var(--atelier-cobalt)] focus-within:ring-2 focus-within:ring-[var(--atelier-cobalt)]/20 transition-all">
+          <UIcon name="i-lucide-search" class="size-4 text-muted ml-3 shrink-0 pointer-events-none" />
           <input
             id="material-filter-input"
             v-model="searchQuery"
-            type="search"
+            type="text"
+            role="searchbox"
+            inputmode="search"
+            autocomplete="off"
+            spellcheck="false"
             placeholder="Filtrar guías o recursos..."
-            class="w-full min-h-[42px] px-2.5 bg-transparent text-xs sm:text-sm text-highlighted placeholder:text-muted focus:outline-none"
+            class="w-full min-w-0 min-h-[42px] px-2.5 bg-transparent border-0 text-xs sm:text-sm text-highlighted placeholder:text-muted focus:outline-none focus:ring-0"
           >
           <button
             v-if="searchQuery"
             type="button"
-            class="inline-flex items-center justify-center min-w-[40px] min-h-[40px] text-muted hover:text-highlighted"
+            class="inline-flex items-center justify-center size-8 mr-1 rounded-[4px] text-muted hover:text-highlighted hover:bg-[var(--atelier-surface-muted)]"
             aria-label="Limpiar filtro"
+            @mousedown.prevent
             @click="searchQuery = ''"
           >
             <UIcon name="i-lucide-x" class="size-3.5" />

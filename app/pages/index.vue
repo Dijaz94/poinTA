@@ -89,9 +89,10 @@ function formatIndex(idx: number): string {
               Buscar por nombre, código o ayudante de asignatura
             </label>
             <div
-              class="relative flex items-center rounded-[8px] border border-[var(--atelier-border-strong)] bg-[var(--atelier-bg)] shadow-[var(--atelier-shadow-rest)] focus-within:border-[var(--atelier-cobalt)] focus-within:shadow-[var(--atelier-shadow-cobalt)] transition-all duration-150"
+              class="relative flex items-center rounded-[8px] border border-[var(--atelier-border-strong)] bg-[var(--atelier-bg)] shadow-[var(--atelier-shadow-rest)] focus-within:border-[var(--atelier-cobalt)] focus-within:ring-2 focus-within:ring-[var(--atelier-cobalt)]/20 transition-all duration-150 cursor-text"
+              @click="searchInputRef?.focus()"
             >
-              <span class="pl-3.5 pr-2 text-muted flex items-center pointer-events-none" aria-hidden="true">
+              <span class="pl-3.5 pr-2.5 text-muted flex items-center pointer-events-none shrink-0" aria-hidden="true">
                 <UIcon name="i-lucide-search" class="size-4" />
               </span>
 
@@ -99,25 +100,29 @@ function formatIndex(idx: number): string {
                 id="subject-catalog-search"
                 ref="searchInputRef"
                 v-model="searchQuery"
-                type="search"
+                type="text"
+                role="searchbox"
+                inputmode="search"
                 autocomplete="off"
+                spellcheck="false"
                 placeholder="Buscar por asignatura, sigla (ej. INF) o ayudante..."
-                class="w-full min-h-[48px] py-2.5 pr-2 bg-transparent text-sm sm:text-base text-highlighted placeholder:text-muted focus:outline-none"
+                class="w-full min-w-0 min-h-[48px] py-2.5 pr-2 bg-transparent border-0 text-sm sm:text-base text-highlighted placeholder:text-muted focus:outline-none focus:ring-0"
               >
 
               <div class="flex items-center gap-1.5 pr-2.5 shrink-0">
                 <button
                   v-if="searchQuery !== ''"
                   type="button"
-                  class="inline-flex items-center justify-center min-w-[44px] min-h-[44px] -my-1 rounded-[6px] text-muted hover:text-highlighted hover:bg-[var(--atelier-surface-muted)] transition-colors"
+                  class="inline-flex items-center justify-center size-8 rounded-[6px] text-muted hover:text-highlighted hover:bg-[var(--atelier-surface-muted)] transition-colors cursor-pointer"
                   aria-label="Limpiar búsqueda"
-                  @click="searchQuery = ''; searchInputRef?.focus()"
+                  @mousedown.prevent
+                  @click.stop="searchQuery = ''; searchInputRef?.focus()"
                 >
                   <UIcon name="i-lucide-x" class="size-4" />
                 </button>
 
                 <kbd
-                  class="hidden sm:inline-flex items-center gap-0.5 px-2 py-1 rounded-[4px] border border-[var(--atelier-border)] bg-[var(--atelier-surface)] font-tech text-[11px] font-medium text-muted select-none"
+                  class="hidden sm:inline-flex items-center gap-0.5 px-2 py-1 rounded-[4px] border border-[var(--atelier-border)] bg-[var(--atelier-surface)] font-tech text-[11px] font-medium text-muted select-none pointer-events-none"
                   title="Atajo de teclado: Ctrl+K o ⌘K"
                 >
                   ⌘K

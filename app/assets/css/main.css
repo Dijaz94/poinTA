@@ -236,10 +236,29 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Foco visible accesible en toda la interfaz */
-:focus-visible {
-  outline: 2px solid var(--atelier-cobalt);
-  outline-offset: 2px;
+@layer base {
+  /* Foco visible accesible para botones y enlaces que respeta utilidades focus:outline-none de Tailwind v4 */
+  :focus-visible {
+    outline: 2px solid var(--atelier-cobalt);
+    outline-offset: 2px;
+  }
+
+  input:focus,
+  input:focus-visible,
+  textarea:focus,
+  textarea:focus-visible {
+    outline: none;
+  }
+}
+
+/* Eliminar el botón X nativo duplicado en inputs de búsqueda de Chrome/Edge/Safari */
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
 }
 
 /* Utilidades de Tipografía Editorial y Técnica */
