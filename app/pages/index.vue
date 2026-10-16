@@ -6,14 +6,31 @@ import { usePinnedSubjects } from '~/composables/usePinnedSubjects'
 const { data: subjects, status, error, refresh } = await useFetch<Subject[]>('/api/subjects', {
   key: 'subjects-index',
   getCachedData: (key, nuxtApp) => {
-    return nuxtApp.payload.data[key]
+    return nuxtApp.payload.data[key] ?? nuxtApp.static.data[key]
   },
 })
 
 const searchQuery = ref('')
+const selectedPrefix = ref<string>('ALL')
 const searchInputRef = ref<HTMLInputElement | null>(null)
 
 const { pinnedIds, isPinned, togglePin } = usePinnedSubjects()
+
+function extractPrefix(code?: string | null): string | null {
+  if (!code) return null
+  const match = code.trim().match(/^([A-Za-zÁÉÍÓÚÑáéíóúñ]{2,6})/)
+  return match?.[1] ? match[1].toUpperCase() : null
+}
+
+const codePrefixes = computed<string[]>(() => {
+  if (!subjects.value) return []
+  const set = new Set<string>()
+  for (const s of subjects.value) {
+    const prefix = extractPrefix(s.code)
+    if (prefix) set.add(prefix)
+  }
+  return Array.from(set).sort()
+})
 
 const pinnedSubjects = computed<Subject[]>(() => {
   if (!subjects.value || pinnedIds.value.length === 0) return []
@@ -23,15 +40,34 @@ const pinnedSubjects = computed<Subject[]>(() => {
 const filteredSubjects = computed<Subject[]>(() => {
   if (!subjects.value) return []
   const q = searchQuery.value.trim().toLowerCase()
-  if (!q) return subjects.value
+  const prefix = selectedPrefix.value
 
-  return subjects.value.filter(subject =>
-    subject.name.toLowerCase().includes(q)
-    || subject.code?.toLowerCase().includes(q)
-    || subject.semester?.toLowerCase().includes(q)
-    || subject.users?.some(u => u.name.toLowerCase().includes(q))
-  )
+  return subjects.value.filter((subject) => {
+    if (prefix !== 'ALL' && extractPrefix(subject.code) !== prefix) {
+      return false
+    }
+    if (!q) return true
+
+    return (
+      subject.name.toLowerCase().includes(q)
+      || subject.code?.toLowerCase().includes(q)
+      || subject.semester?.toLowerCase().includes(q)
+      || subject.users?.some(u => u.name.toLowerCase().includes(q))
+    )
+  })
 })
+
+function resetFilters() {
+  searchQuery.value = ''
+  selectedPrefix.value = 'ALL'
+}
+
+function handleSearchEnter() {
+  const firstMatch = filteredSubjects.value[0]
+  if (firstMatch && (searchQuery.value.trim() !== '' || filteredSubjects.value.length === 1)) {
+    navigateTo(`/${firstMatch.id}`)
+  }
+}
 
 const handleGlobalKeydown = (e: KeyboardEvent) => {
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
@@ -62,73 +98,118 @@ function formatIndex(idx: number): string {
 
 <template>
   <div class="flex-1 flex flex-col">
-    <!-- Hero Editorial con Grilla Arquitectónica Expuesta de 1px -->
-    <section class="relative border-b border-[var(--atelier-border)] bg-[var(--atelier-surface)] atelier-grid-pattern">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
-        <div class="max-w-3xl mx-auto text-center">
-          <!-- Etiqueta Superior Tipo Ficha Técnica -->
-          <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-[4px] border border-[var(--atelier-border)] bg-[var(--atelier-bg)] mb-5">
-            <span class="size-1.5 rounded-full bg-[var(--atelier-cobalt)]" aria-hidden="true" />
-            <span class="atelier-tag text-toned">
-              CATÁLOGO DOCENTE // ÍNDICE DE AYUDANTÍAS
+    <!-- Hero Opción A: Two-Tone Thesis & Command Ledger (Scandinavian Design × Engineering) -->
+    <section class="border-b border-[var(--atelier-border)] bg-[var(--atelier-surface)]">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
+        <!-- Capítulo superior: índice izquierdo + telemetría derecha -->
+        <div class="flex items-center justify-between gap-4 pb-4 mb-6 sm:mb-8 border-b border-[var(--atelier-border-muted)]">
+          <span class="atelier-tag text-muted">
+            00 // DIRECTORIO ACADÉMICO
+          </span>
+          <span v-if="subjects" class="atelier-tag text-muted">
+            {{ String(subjects.length).padStart(2, '0') }} ASIGNATURAS ACTIVAS
+          </span>
+        </div>
+
+        <!-- Two-Tone Inline Heading: alineación izquierda estricta, misma escala y línea base -->
+        <div class="max-w-5xl">
+          <h1 class="font-editorial text-3xl sm:text-4xl lg:text-[2.75rem] font-medium tracking-tight leading-[1.15] text-left">
+            <span class="text-highlighted">
+              Archivo y coordinación de <span class="italic font-normal text-[var(--atelier-cobalt)]">ayudantías</span> informáticas.
             </span>
-          </div>
-
-          <!-- Titular en Newsreader con Acento en Itálica -->
-          <h1 class="font-editorial text-4xl sm:text-5xl lg:text-[3.5rem] font-medium tracking-tight text-highlighted leading-[1.08]">
-            Archivo y coordinación de <span class="italic font-normal text-[var(--atelier-cobalt)]">ayudantías</span> informáticas
+            {{ ' ' }}
+            <span class="text-muted font-normal">
+              Consulta guías de estudio, horarios de ayudantías, salas y votaciones activas de tus asignaturas.
+            </span>
           </h1>
+        </div>
 
-          <p class="mt-4 text-base sm:text-lg text-toned max-w-2xl mx-auto leading-relaxed">
-            Consulta guías de estudio por unidad, horarios semanales, salas y votaciones activas de tus asignaturas con acceso directo.
-          </p>
-
-          <!-- Campo de Búsqueda Central (Atajo ⌘K / Ctrl+K) -->
-          <div class="mt-8 max-w-2xl mx-auto">
+        <!-- Command Ledger: Buscador (ctrl + K) + Filtros rápidos por sigla -->
+        <div
+          class="mt-8 sm:mt-10 rounded-[8px] border border-[var(--atelier-border-strong)] bg-[var(--atelier-bg)] shadow-[var(--atelier-shadow-rest)] divide-y lg:divide-y-0 lg:divide-x divide-[var(--atelier-border)] flex flex-col lg:flex-row lg:items-stretch focus-within:border-[var(--atelier-cobalt)] focus-within:ring-2 focus-within:ring-[var(--atelier-cobalt)]/15 transition-all duration-150"
+        >
+          <!-- Celda Izquierda: Input de búsqueda -->
+          <div
+            class="relative flex-1 flex items-center min-w-0 cursor-text"
+            @click="searchInputRef?.focus()"
+          >
             <label for="subject-catalog-search" class="sr-only">
               Buscar por nombre, código o ayudante de asignatura
             </label>
-            <div
-              class="relative flex items-center rounded-[8px] border border-[var(--atelier-border-strong)] bg-[var(--atelier-bg)] shadow-[var(--atelier-shadow-rest)] focus-within:border-[var(--atelier-cobalt)] focus-within:ring-2 focus-within:ring-[var(--atelier-cobalt)]/20 transition-all duration-150 cursor-text"
-              @click="searchInputRef?.focus()"
+
+            <span class="pl-4 pr-2.5 text-muted flex items-center pointer-events-none shrink-0" aria-hidden="true">
+              <UIcon name="i-lucide-search" class="size-4" />
+            </span>
+
+            <input
+              id="subject-catalog-search"
+              ref="searchInputRef"
+              v-model="searchQuery"
+              type="text"
+              role="searchbox"
+              inputmode="search"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="Filtrar por asignatura, sigla o ayudante..."
+              class="w-full min-w-0 min-h-[50px] py-2.5 pr-2 bg-transparent border-0 text-sm sm:text-base text-highlighted placeholder:text-muted focus:outline-none focus:ring-0"
+              @keydown.enter.prevent="handleSearchEnter"
             >
-              <span class="pl-3.5 pr-2.5 text-muted flex items-center pointer-events-none shrink-0" aria-hidden="true">
-                <UIcon name="i-lucide-search" class="size-4" />
-              </span>
 
-              <input
-                id="subject-catalog-search"
-                ref="searchInputRef"
-                v-model="searchQuery"
-                type="text"
-                role="searchbox"
-                inputmode="search"
-                autocomplete="off"
-                spellcheck="false"
-                placeholder="Buscar por asignatura, sigla (ej. INF) o ayudante..."
-                class="w-full min-w-0 min-h-[48px] py-2.5 pr-2 bg-transparent border-0 text-sm sm:text-base text-highlighted placeholder:text-muted focus:outline-none focus:ring-0"
+            <div class="flex items-center gap-1.5 pr-3 shrink-0">
+              <button
+                v-if="searchQuery !== ''"
+                type="button"
+                class="inline-flex items-center justify-center size-8 rounded-[6px] text-muted hover:text-highlighted hover:bg-[var(--atelier-surface-muted)] transition-colors cursor-pointer"
+                aria-label="Limpiar búsqueda"
+                @mousedown.prevent
+                @click.stop="searchQuery = ''; searchInputRef?.focus()"
               >
+                <UIcon name="i-lucide-x" class="size-4" />
+              </button>
 
-              <div class="flex items-center gap-1.5 pr-2.5 shrink-0">
-                <button
-                  v-if="searchQuery !== ''"
-                  type="button"
-                  class="inline-flex items-center justify-center size-8 rounded-[6px] text-muted hover:text-highlighted hover:bg-[var(--atelier-surface-muted)] transition-colors cursor-pointer"
-                  aria-label="Limpiar búsqueda"
-                  @mousedown.prevent
-                  @click.stop="searchQuery = ''; searchInputRef?.focus()"
-                >
-                  <UIcon name="i-lucide-x" class="size-4" />
-                </button>
-
-                <kbd
-                  class="hidden sm:inline-flex items-center gap-0.5 px-2 py-1 rounded-[4px] border border-[var(--atelier-border)] bg-[var(--atelier-surface)] font-tech text-[11px] font-medium text-muted select-none pointer-events-none"
-                  title="Atajo de teclado: Ctrl+K o ⌘K"
-                >
-                  ⌘K
-                </kbd>
-              </div>
+              <kbd
+                class="hidden sm:inline-flex items-center gap-0.5 px-2 py-1 rounded-[4px] border border-[var(--atelier-border)] bg-[var(--atelier-surface)] font-tech text-[11px] font-medium text-muted select-none pointer-events-none"
+                title="Atajo de teclado: Ctrl+K o ⌘K"
+              >
+                ctrl + K
+              </kbd>
             </div>
+          </div>
+
+          <!-- Celda Derecha: Filtro rápido por sigla de departamento -->
+          <div
+            v-if="codePrefixes.length > 0"
+            class="px-3 py-2 flex items-center gap-1.5 overflow-x-auto bg-[var(--atelier-surface)]/70 shrink-0"
+            role="group"
+            aria-label="Filtrar por sigla de asignatura"
+          >
+            <span class="atelier-tag text-muted mr-1 hidden sm:inline select-none">
+              SIGLA:
+            </span>
+
+            <button
+              type="button"
+              class="px-2.5 py-1.5 min-h-[34px] rounded-[5px] font-tech text-xs font-medium transition-colors cursor-pointer shrink-0"
+              :class="selectedPrefix === 'ALL'
+                ? 'bg-[var(--atelier-text-high)] text-[var(--atelier-surface)]'
+                : 'text-muted hover:text-highlighted hover:bg-[var(--atelier-surface-muted)]'"
+              @click="selectedPrefix = 'ALL'"
+            >
+              TODOS
+            </button>
+
+            <button
+              v-for="prefix in codePrefixes"
+              :key="prefix"
+              type="button"
+              class="px-2.5 py-1.5 min-h-[34px] rounded-[5px] font-tech text-xs font-medium transition-colors cursor-pointer shrink-0"
+              :class="selectedPrefix === prefix
+                ? 'bg-[var(--atelier-cobalt)] text-white'
+                : 'text-muted hover:text-highlighted hover:bg-[var(--atelier-surface-muted)]'"
+              @click="selectedPrefix = selectedPrefix === prefix ? 'ALL' : prefix"
+            >
+              {{ prefix }}
+            </button>
           </div>
         </div>
       </div>
@@ -149,7 +230,7 @@ function formatIndex(idx: number): string {
             </h2>
           </div>
           <span class="font-tech text-[11px] text-muted hidden sm:inline">
-            ACCESO RÁPIDO GUARDADO EN ESTE DISPOSITIVO
+            ACCESO RÁPIDO
           </span>
         </div>
 
@@ -171,7 +252,7 @@ function formatIndex(idx: number): string {
               ÍNDICE GENERAL // ARCHIVO DE CURSOS
             </span>
             <h2 class="font-editorial text-2xl sm:text-3xl font-medium text-highlighted">
-              {{ searchQuery ? 'Resultados de búsqueda' : 'Asignaturas disponibles' }}
+              {{ (searchQuery || selectedPrefix !== 'ALL') ? 'Resultados filtrados' : 'Asignaturas disponibles' }}
             </h2>
           </div>
 
@@ -209,7 +290,7 @@ function formatIndex(idx: number): string {
         >
           <UIcon name="i-lucide-book-open" class="size-8 text-muted mb-3 mx-auto" />
           <p class="font-editorial text-xl text-highlighted mb-1">Sin asignaturas registradas</p>
-          <p class="text-sm text-muted">Aún no se han publicado asignaturas para este semestre.</p>
+          <p class="text-sm text-muted">Aún no se han publicado asignaturas.</p>
         </div>
 
         <!-- Sin Coincidencias de Búsqueda -->
@@ -219,12 +300,12 @@ function formatIndex(idx: number): string {
         >
           <UIcon name="i-lucide-search-x" class="size-8 text-muted mb-3 mx-auto" />
           <p class="font-editorial text-xl text-highlighted mb-1">
-            Sin coincidencias para «{{ searchQuery }}»
+            Sin coincidencias para el filtro actual
           </p>
           <p class="text-sm text-muted mb-4">
             Verifica el código de la asignatura o prueba con otro término.
           </p>
-          <UButton color="neutral" variant="soft" @click="searchQuery = ''">
+          <UButton color="neutral" variant="soft" @click="resetFilters">
             Restablecer catálogo
           </UButton>
         </div>

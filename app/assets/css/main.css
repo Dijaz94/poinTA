@@ -8,57 +8,57 @@
  * Sin glassmorphism, sin auroras animadas, prioridad en legibilidad WCAG AA y rendimiento.
  */
 @theme static {
-  /* Primary — Azul Cobalto de Archivo (#3350D0) */
-  --color-indigo-50: #f0f3fc;
-  --color-indigo-100: #dee5f9;
-  --color-indigo-200: #c2cff4;
-  --color-indigo-300: #99b0ec;
-  --color-indigo-400: #7b96ff;
-  --color-indigo-500: #4c68de;
-  --color-indigo-600: #3350d0;
-  --color-indigo-700: #283fa8;
-  --color-indigo-800: #213487;
-  --color-indigo-900: #1d2d6d;
-  --color-indigo-950: #121b42;
+  /* Primary — Ultramar de Precisión (#2447C7 / #7C9BFF) */
+  --color-indigo-50: #edf1fc;
+  --color-indigo-100: #dce4f9;
+  --color-indigo-200: #b8c6f4;
+  --color-indigo-300: #94abec;
+  --color-indigo-400: #7c9bff;
+  --color-indigo-500: #3d63dd;
+  --color-indigo-600: #2447c7;
+  --color-indigo-700: #1d39a3;
+  --color-indigo-800: #182f85;
+  --color-indigo-900: #15286d;
+  --color-indigo-950: #0d1842;
 
-  /* Secondary — Verde Liquen (#248277) */
-  --color-teal-50: #eef8f6;
-  --color-teal-100: #d5efeb;
-  --color-teal-200: #aee0d9;
-  --color-teal-300: #7bc9c0;
-  --color-teal-400: #48b8ac;
-  --color-teal-500: #2b9a8d;
-  --color-teal-600: #248277;
-  --color-teal-700: #1e6860;
-  --color-teal-800: #1b534d;
-  --color-teal-900: #184540;
-  --color-teal-950: #0b2623;
+  /* Secondary — Pino Mineral Nórdico (#236B5E / #52C4B0) */
+  --color-teal-50: #eaf4f2;
+  --color-teal-100: #cfe7e2;
+  --color-teal-200: #a7d7ce;
+  --color-teal-300: #78bfb3;
+  --color-teal-400: #52c4b0;
+  --color-teal-500: #2e8575;
+  --color-teal-600: #236b5e;
+  --color-teal-700: #1c564b;
+  --color-teal-800: #18463e;
+  --color-teal-900: #143a34;
+  --color-teal-950: #0a1f1c;
 
-  /* Neutral — Papel Algodón Cálido (#F5F1E8 / #DED6C6) */
-  --color-stone-50: #fcfbf7;
-  --color-stone-100: #f5f1e8;
-  --color-stone-200: #eae4d7;
-  --color-stone-300: #ded6c6;
-  --color-stone-400: #c5b9a5;
-  --color-stone-500: #8c8272;
-  --color-stone-600: #635c50;
-  --color-stone-700: #454038;
-  --color-stone-800: #2b2823;
-  --color-stone-900: #1a1815;
-  --color-stone-950: #0f0e0c;
+  /* Neutral — Piedra Alabastro Nórdica & Grafito Obsidiana (#F6F6F4 / #0B0C0E) */
+  --color-stone-50: #ffffff;
+  --color-stone-100: #f6f6f4;
+  --color-stone-200: #eeeeec;
+  --color-stone-300: #e2e2de;
+  --color-stone-400: #c7c7c0;
+  --color-stone-500: #8a8d96;
+  --color-stone-600: #5f626a;
+  --color-stone-700: #3f4248;
+  --color-stone-800: #23252b;
+  --color-stone-900: #121316;
+  --color-stone-950: #0b0c0e;
 
-  /* Warning / Terracota Editorial (#C85A32) — Uso moderado: votaciones activas, plazos y alertas */
-  --color-amber-50: #fdf4f0;
-  --color-amber-100: #fae5dc;
-  --color-amber-200: #f5cab8;
-  --color-amber-300: #efa88c;
-  --color-amber-400: #f08c69;
-  --color-amber-500: #d96e46;
-  --color-amber-600: #c85a32;
-  --color-amber-700: #a44625;
-  --color-amber-800: #853a21;
-  --color-amber-900: #6c321f;
-  --color-amber-950: #3a170d;
+  /* Warning / Acento Editorial Berry (#B02A50 en claro / #F0829F en oscuro) — Votaciones activas, plazos y alertas */
+  --color-amber-50: #fceef2;
+  --color-amber-100: #f9dce5;
+  --color-amber-200: #f3bccd;
+  --color-amber-300: #f0829f;
+  --color-amber-400: #f0829f;
+  --color-amber-500: #d1436b;
+  --color-amber-600: #b02a50;
+  --color-amber-700: #912041;
+  --color-amber-800: #781d37;
+  --color-amber-900: #651c31;
+  --color-amber-950: #390b19;
 
   /* Error — Carmesí de Archivo */
   --color-rose-50: #fdf2f3;
@@ -73,18 +73,18 @@
   --color-rose-900: #6d1e28;
   --color-rose-950: #3d0b12;
 
-  /* Chrome / Tinta Noche (#0C101C / #13192B / #252F4A) */
-  --color-ink-50: #f2f4f9;
-  --color-ink-100: #e2e6f1;
-  --color-ink-200: #c6cee3;
-  --color-ink-300: #94a0c4;
-  --color-ink-400: #6c7ba3;
-  --color-ink-500: #4d5b82;
-  --color-ink-600: #37466d;
-  --color-ink-700: #252f4a;
-  --color-ink-800: #1a2238;
-  --color-ink-900: #13192b;
-  --color-ink-950: #0c101c;
+  /* Chrome / Obsidiana Técnica (#0B0C0E / #121316 / #23252B) */
+  --color-ink-50: #f3f4f6;
+  --color-ink-100: #e5e7eb;
+  --color-ink-200: #cfd2d9;
+  --color-ink-300: #9498a3;
+  --color-ink-400: #686c77;
+  --color-ink-500: #4b4e57;
+  --color-ink-600: #363942;
+  --color-ink-700: #23252b;
+  --color-ink-800: #181a1e;
+  --color-ink-900: #121316;
+  --color-ink-950: #0b0c0e;
 
   /* Typography — Solo 3 familias (Newsreader, Inter, IBM Plex Mono) */
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
@@ -93,39 +93,39 @@
 }
 
 /*
- * Tokens Reutilizables del Sistema "Atelier Editorial de Ingeniería"
+ * Tokens Reutilizables del Sistema "Nordic Mineral & Ultramarine"
  */
 :root {
-  /* Superficies y Bordes — Modo Claro */
-  --atelier-bg: #F5F1E8;
-  --atelier-surface: #FCFBF7;
+  /* Superficies y Bordes — Modo Claro (Piedra Alabastro & Blanco Óptico) */
+  --atelier-bg: #F6F6F4;
+  --atelier-surface: #FFFFFF;
   --atelier-surface-elevated: #FFFFFF;
-  --atelier-surface-muted: #ECE6D8;
-  --atelier-border: #DED6C6;
-  --atelier-border-muted: #E7E0D2;
-  --atelier-border-strong: #BFB39C;
+  --atelier-surface-muted: #EEEEEC;
+  --atelier-border: #E2E2DE;
+  --atelier-border-muted: #ECECE8;
+  --atelier-border-strong: #C7C7C0;
 
   /* Tipografía y Contraste WCAG AA — Modo Claro */
-  --atelier-text-high: #121621;       /* Ratio > 15:1 sobre #FCFBF7 */
-  --atelier-text: #2A3040;            /* Ratio > 11:1 sobre #FCFBF7 */
-  --atelier-text-toned: #464D5F;      /* Ratio > 7.5:1 sobre #FCFBF7 */
-  --atelier-text-muted: #5A6072;      /* Ratio > 5.4:1 sobre #F5F1E8 (WCAG AA) */
-  --atelier-text-dimmed: #767C8E;
+  --atelier-text-high: #111214;       /* Ratio > 18:1 sobre #FFFFFF */
+  --atelier-text: #26282D;            /* Ratio > 14:1 sobre #FFFFFF */
+  --atelier-text-toned: #43464E;      /* Ratio > 9.3:1 sobre #FFFFFF */
+  --atelier-text-muted: #5F626A;      /* Ratio > 5.7:1 sobre #F6F6F4 (WCAG AA) */
+  --atelier-text-dimmed: #7A7E87;
 
   /* Acentos Semánticos — Modo Claro */
-  --atelier-cobalt: #3350D0;          /* Ratio 6.5:1 sobre #FCFBF7 (WCAG AA) */
-  --atelier-cobalt-soft: #EBF0FC;
-  --atelier-cobalt-border: #B8C7F4;
+  --atelier-cobalt: #2447C7;          /* Ratio 7.6:1 sobre #FFFFFF (WCAG AAA) */
+  --atelier-cobalt-soft: #EDF1FC;
+  --atelier-cobalt-border: #B8C6F4;
 
-  --atelier-lichen: #1E6E65;          /* Ajustado para texto AA (5.7:1) y #248277 en superficies */
-  --atelier-lichen-solid: #248277;
-  --atelier-lichen-soft: #E8F5F3;
-  --atelier-lichen-border: #A5DBD4;
+  --atelier-lichen: #236B5E;          /* Ratio 6.3:1 sobre #FFFFFF (WCAG AA) */
+  --atelier-lichen-solid: #236B5E;
+  --atelier-lichen-soft: #EAF4F2;
+  --atelier-lichen-border: #A7D7CE;
 
-  --atelier-terracotta: #B54B24;      /* Ratio 5.3:1 en texto claro, #C85A32 en bordes/badges */
-  --atelier-terracotta-solid: #C85A32;
-  --atelier-terracotta-soft: #FBECE6;
-  --atelier-terracotta-border: #EAB6A1;
+  --atelier-terracotta: #B02A50;      /* Ratio 6.6:1 sobre #FFFFFF (WCAG AA) */
+  --atelier-terracotta-solid: #B02A50;
+  --atelier-terracotta-soft: #FCEEF2;
+  --atelier-terracotta-border: #E8B2C2;
 
   /* Radios Moderados (Ficha Técnica: 6px - 10px) */
   --atelier-radius-xs: 4px;
@@ -142,10 +142,10 @@
   --atelier-space-8: 2rem;
 
   /* Sombras Nítidas de Archivo (Sin Blur Grande) */
-  --atelier-shadow-rest: 0 1px 0 0 #DED6C6;
-  --atelier-shadow-hover: 0 3px 0 0 #C4B8A2;
-  --atelier-shadow-cobalt: 0 3px 0 0 #3350D0;
-  --atelier-shadow-terracotta: 0 3px 0 0 #C85A32;
+  --atelier-shadow-rest: 0 1px 0 0 #E2E2DE;
+  --atelier-shadow-hover: 0 3px 0 0 #C7C7C0;
+  --atelier-shadow-cobalt: 0 3px 0 0 #2447C7;
+  --atelier-shadow-terracotta: 0 3px 0 0 #B02A50;
 
   /* Movimiento */
   --atelier-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -156,75 +156,75 @@
   --ui-bg: var(--atelier-bg);
   --ui-bg-muted: var(--atelier-surface-muted);
   --ui-bg-elevated: var(--atelier-surface);
-  --ui-bg-accented: #E2DAC9;
-  --ui-bg-inverted: #0C101C;
+  --ui-bg-accented: #E6E6E2;
+  --ui-bg-inverted: #0B0C0E;
   --ui-border: var(--atelier-border);
   --ui-border-muted: var(--atelier-border-muted);
   --ui-border-accented: var(--atelier-border-strong);
-  --ui-border-inverted: #0C101C;
+  --ui-border-inverted: #0B0C0E;
   --ui-text-dimmed: var(--atelier-text-dimmed);
   --ui-text-muted: var(--atelier-text-muted);
   --ui-text-toned: var(--atelier-text-toned);
   --ui-text: var(--atelier-text);
   --ui-text-highlighted: var(--atelier-text-high);
-  --ui-text-inverted: #FCFBF7;
+  --ui-text-inverted: #FFFFFF;
   --ui-radius: 0.5rem;
 }
 
 .dark {
-  /* Superficies y Bordes — Modo Oscuro */
-  --atelier-bg: #0C101C;
-  --atelier-surface: #13192B;
-  --atelier-surface-elevated: #182036;
-  --atelier-surface-muted: #0F1524;
-  --atelier-border: #252F4A;
-  --atelier-border-muted: #1D253B;
-  --atelier-border-strong: #3B4A72;
+  /* Superficies y Bordes — Modo Oscuro (Obsidiana Neutra & Grafito Técnico) */
+  --atelier-bg: #0B0C0E;
+  --atelier-surface: #121316;
+  --atelier-surface-elevated: #181A1E;
+  --atelier-surface-muted: #16181C;
+  --atelier-border: #23252B;
+  --atelier-border-muted: #1B1D22;
+  --atelier-border-strong: #363942;
 
   /* Tipografía y Contraste WCAG AA — Modo Oscuro */
-  --atelier-text-high: #F5F1E8;       /* Ratio > 15:1 sobre #13192B */
-  --atelier-text: #DCE1F0;            /* Ratio > 12:1 sobre #13192B */
-  --atelier-text-toned: #B6C0DC;      /* Ratio > 8.5:1 sobre #13192B */
-  --atelier-text-muted: #94A0C4;      /* Ratio > 5.8:1 sobre #13192B (WCAG AA) */
-  --atelier-text-dimmed: #6C7BA3;
+  --atelier-text-high: #F3F4F6;       /* Ratio > 16:1 sobre #121316 */
+  --atelier-text: #DCDEE4;            /* Ratio > 13:1 sobre #121316 */
+  --atelier-text-toned: #B4B8C2;      /* Ratio > 9:1 sobre #121316 */
+  --atelier-text-muted: #9498A3;      /* Ratio > 6.2:1 sobre #121316 (WCAG AA) */
+  --atelier-text-dimmed: #686C77;
 
   /* Acentos Semánticos — Modo Oscuro (Luminosidad ajustada para contraste AA) */
-  --atelier-cobalt: #829DFF;          /* Ratio 6.9:1 sobre #13192B (WCAG AA) */
-  --atelier-cobalt-soft: #172247;
-  --atelier-cobalt-border: #2E448A;
+  --atelier-cobalt: #7C9BFF;          /* Ratio 7.2:1 sobre #121316 (WCAG AAA) */
+  --atelier-cobalt-soft: #151D38;
+  --atelier-cobalt-border: #293B75;
 
-  --atelier-lichen: #4FD1C5;          /* Ratio 8.8:1 sobre #13192B (WCAG AA) */
-  --atelier-lichen-solid: #248277;
-  --atelier-lichen-soft: #112A2E;
-  --atelier-lichen-border: #1F5756;
+  --atelier-lichen: #52C4B0;          /* Ratio 8.7:1 sobre #121316 (WCAG AAA) */
+  --atelier-lichen-solid: #2A7B6C;
+  --atelier-lichen-soft: #112422;
+  --atelier-lichen-border: #1E4D46;
 
-  --atelier-terracotta: #F49775;      /* Ratio 7.4:1 sobre #13192B (WCAG AA) */
-  --atelier-terracotta-solid: #C85A32;
-  --atelier-terracotta-soft: #2A191B;
-  --atelier-terracotta-border: #6E3626;
+  --atelier-terracotta: #F0829F;      /* Ratio 7.5:1 sobre #121316 (WCAG AAA) */
+  --atelier-terracotta-solid: #B02A50;
+  --atelier-terracotta-soft: #26131A;
+  --atelier-terracotta-border: #68243A;
 
   /* Sombras Nítidas de Archivo — Modo Oscuro */
-  --atelier-shadow-rest: 0 1px 0 0 #252F4A;
-  --atelier-shadow-hover: 0 3px 0 0 #3B4A72;
-  --atelier-shadow-cobalt: 0 3px 0 0 #5C7CFA;
-  --atelier-shadow-terracotta: 0 3px 0 0 #C85A32;
+  --atelier-shadow-rest: 0 1px 0 0 #23252B;
+  --atelier-shadow-hover: 0 3px 0 0 #363942;
+  --atelier-shadow-cobalt: 0 3px 0 0 #7C9BFF;
+  --atelier-shadow-terracotta: 0 3px 0 0 #F0829F;
 
   /* Mapeo a variables de @nuxt/ui */
   --ui-bg: var(--atelier-bg);
   --ui-bg-muted: var(--atelier-surface-muted);
   --ui-bg-elevated: var(--atelier-surface);
-  --ui-bg-accented: #1E2742;
-  --ui-bg-inverted: #F5F1E8;
+  --ui-bg-accented: #1E2026;
+  --ui-bg-inverted: #F6F6F4;
   --ui-border: var(--atelier-border);
   --ui-border-muted: var(--atelier-border-muted);
   --ui-border-accented: var(--atelier-border-strong);
-  --ui-border-inverted: #F5F1E8;
+  --ui-border-inverted: #F6F6F4;
   --ui-text-dimmed: var(--atelier-text-dimmed);
   --ui-text-muted: var(--atelier-text-muted);
   --ui-text-toned: var(--atelier-text-toned);
   --ui-text: var(--atelier-text);
   --ui-text-highlighted: var(--atelier-text-high);
-  --ui-text-inverted: #0C101C;
+  --ui-text-inverted: #0B0C0E;
 }
 
 /* Base Editorial Typography & Focus */
@@ -270,14 +270,6 @@ input[type="search"]::-webkit-search-results-decoration {
 .font-tech {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-}
-
-/* Retícula arquitectónica expuesta (sin gradientes pesados ni blur) */
-.atelier-grid-pattern {
-  background-image:
-    linear-gradient(to right, var(--atelier-border-muted) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--atelier-border-muted) 1px, transparent 1px);
-  background-size: 32px 32px;
 }
 
 /* Ficha de Archivo Técnico — Componente / Clase Base */

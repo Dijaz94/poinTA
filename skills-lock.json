@@ -13,6 +13,12 @@
       "skillPath": "prisma-database-setup/SKILL.md",
       "computedHash": "0911d9454bd48df3badd23a50fd90a280eabb15dcbd472c14e7b729075dadefb"
     },
+    "scandinavian-design": {
+      "source": "ericzakariasson/scandinavian-design",
+      "sourceType": "github",
+      "skillPath": "skills/scandinavian-design/SKILL.md",
+      "computedHash": "30398f7ebd90133d295d8e36db1add77d47be52de4b4a533f839da25967debd8"
+    },
     "supabase": {
       "source": "supabase/agent-skills",
       "sourceType": "github",
