@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PollOptionData } from '~/types/announcements'
-import { pluralVotes } from '~/utils/poll';
-import { votePercentage } from '~/utils/poll';
+import { pluralVotes, votePercentage } from '~/utils/poll'
+
 defineProps<{
   options: PollOptionData[]
   totalVotes?: number | null
@@ -12,34 +12,42 @@ defineProps<{
 </script>
 
 <template>
-  <div class="space-y-2.5">
+  <div class="space-y-2">
     <div
-      v-for="opt in options"
+      v-for="(opt, idx) in options"
       :key="opt.id"
-      class="space-y-1 rounded-lg border transition-all"
+      class="rounded-[6px] border transition-colors"
       :class="[
         size === 'sm' ? 'p-2.5' : 'p-3',
         votedOptionId === opt.id
-          ? 'bg-primary/10 border-primary/40 ring-1 ring-primary/30'
-          : 'bg-muted/20 border-muted/40',
+          ? 'bg-[var(--atelier-cobalt-soft)]/60 border-[var(--atelier-cobalt)]'
+          : 'bg-[var(--atelier-surface-muted)]/35 border-[var(--atelier-border)]',
       ]"
     >
-      <div class="flex items-center justify-between text-sm">
-        <div class="flex items-center gap-2">
-          <span class="font-medium text-default">{{ opt.label }}</span>
-          <UBadge v-if="votedOptionId === opt.id" color="primary" variant="solid" size="xs">
-            Tu voto
-          </UBadge>
+      <div class="flex items-center justify-between gap-2 text-sm mb-1.5">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="font-tech text-xs text-muted shrink-0">
+            {{ String.fromCharCode(65 + idx) }}.
+          </span>
+          <span class="font-medium text-highlighted truncate">{{ opt.label }}</span>
+          <span
+            v-if="votedOptionId === opt.id"
+            class="font-tech text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded-[4px] bg-[var(--atelier-cobalt)] text-white shrink-0"
+          >
+            TU VOTO
+          </span>
         </div>
-        <span class="text-xs font-bold text-muted">
-          {{ opt.voteCount }} {{ pluralVotes(opt.voteCount) }}
-          ({{ votePercentage(opt.voteCount, totalVotes) }}%)
+
+        <span class="font-tech text-xs font-semibold text-toned shrink-0">
+          {{ opt.voteCount }} {{ pluralVotes(opt.voteCount) }} · {{ votePercentage(opt.voteCount, totalVotes) }}%
         </span>
       </div>
-      <div class="w-full bg-muted/50 rounded-full h-2 overflow-hidden">
+
+      <!-- Barra de progreso técnica con bordes definidos -->
+      <div class="w-full bg-[var(--atelier-border-muted)] rounded-[3px] h-2 overflow-hidden">
         <div
-          class="h-2 rounded-full transition-all duration-500"
-          :class="votedOptionId && votedOptionId !== opt.id ? 'bg-primary/70' : 'bg-primary'"
+          class="h-2 rounded-[3px] transition-all duration-200"
+          :class="votedOptionId === opt.id ? 'bg-[var(--atelier-cobalt)]' : 'bg-[var(--atelier-cobalt)]/75'"
           :style="{ width: `${votePercentage(opt.voteCount, totalVotes)}%` }"
         />
       </div>

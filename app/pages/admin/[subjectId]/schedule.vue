@@ -245,16 +245,16 @@ async function handleRemoveSession(session: Session) {
           <div
             v-for="d in DAYS"
             :key="d.value"
-            class="min-h-[180px] rounded-xl bg-muted/30 border border-muted/50 p-2 flex flex-col gap-2"
+            class="min-w-0 min-h-[180px] rounded-xl bg-muted/30 border border-muted/50 p-2 flex flex-col gap-2 overflow-hidden"
           >
-            <span class="text-xs font-bold text-highlighted uppercase tracking-wider px-1 pb-1 border-b border-muted/40 text-center">
+            <span class="text-xs font-bold text-highlighted uppercase tracking-wider px-1 pb-1 border-b border-muted/40 text-center truncate">
               {{ d.label }}
             </span>
 
             <div
               v-sortable="d.value"
               :data-day="d.value"
-              class="flex-1 flex flex-col gap-2"
+              class="flex-1 flex flex-col gap-2 min-w-0"
             >
               <SessionCard
                 v-for="session in columns[d.value]"

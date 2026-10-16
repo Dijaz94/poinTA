@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { usePollVoting } from '~/composables/usePollVoting';
-import { pluralVotes } from '~/utils/poll';
+import { usePollVoting } from '~/composables/usePollVoting'
+import { pluralVotes } from '~/utils/poll'
+import { formatTimeRemaining } from '~/utils/calendar'
 import type { Announcement } from '~/types/announcements'
 
 const props = defineProps<{
   announcement: Announcement
+  index?: string | number
 }>()
 
 const emit = defineEmits<{
@@ -32,118 +34,120 @@ onMounted(init)
 </script>
 
 <template>
-  <UCard
-    :ui="{
-      root: 'overflow-hidden border-l-4 border-l-indigo-500',
-      header: 'pb-2 bg-muted/10',
-      body: 'pt-4 space-y-4',
-    }"
+  <TechnicalCard
+    :index="index"
+    :eyebrow="isClosed ? 'CONSULTA CERRADA' : 'VOTACIÓN ACTIVA'"
+    :accent="isClosed ? 'none' : 'terracotta'"
   >
-    <template #header>
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <UBadge color="primary" variant="subtle" size="xs">
-            <UIcon name="i-lucide-chart-bar" class="size-3 mr-1" />
-            Votación
-          </UBadge>
+    <template #meta>
+      <div class="flex flex-wrap items-center gap-2">
+        <span
+          v-if="announcement.deadline"
+          class="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] font-tech text-[11px] font-semibold border"
+          :class="isClosed
+            ? 'bg-[var(--atelier-surface)] border-[var(--atelier-border)] text-muted'
+            : 'bg-[var(--atelier-terracotta-soft)] border-[var(--atelier-terracotta-border)] text-[var(--atelier-terracotta)]'"
+          :title="formatDateTime(announcement.deadline)"
+        >
+          <UIcon :name="isClosed ? 'i-lucide-lock' : 'i-lucide-timer'" class="size-3" />
+          {{ isClosed ? 'CERRADA' : formatTimeRemaining(announcement.deadline) }}
+        </span>
 
-          <UBadge
-            v-if="announcement.deadline"
-            :color="isClosed ? 'error' : 'warning'"
-            variant="soft"
-            size="xs"
-          >
-            <UIcon name="i-lucide-clock" class="size-3 mr-1" />
-            {{ isClosed ? 'Votación Cerrada' : `Cierra: ${formatDateTime(announcement.deadline)}` }}
-          </UBadge>
-        </div>
-
-        <div class="flex items-center gap-1.5 text-xs text-muted whitespace-nowrap">
-          <UIcon name="i-lucide-clock" class="size-3.5" />
+        <span class="font-tech text-xs text-muted hidden sm:inline">
           {{ formatDateTime(announcement.createdAt) }}
-        </div>
+        </span>
       </div>
     </template>
 
-    <div>
-      <h3 class="font-bold text-lg text-default">{{ announcement.title }}</h3>
-      <p v-if="announcement.content" class="text-default text-sm whitespace-pre-wrap leading-relaxed mt-1">
-        {{ announcement.content }}
-      </p>
-    </div>
-
-    <!-- Votación finalizada -->
-    <div v-if="isClosed" class="space-y-4 pt-2 border-t border-muted/30">
-      <div class="flex items-center justify-between text-xs font-semibold text-muted">
-        <span class="flex items-center gap-1 text-error">
-          <UIcon name="i-lucide-lock" class="size-3.5" />
-          Esta votación ha finalizado. Resultados definitivos:
-        </span>
-        <span class="text-primary font-bold">
-          {{ announcement.totalVotes }} {{ pluralVotes(announcement.totalVotes, true) }}
-        </span>
+    <div class="space-y-4">
+      <div>
+        <h3 class="font-editorial text-xl sm:text-2xl font-medium text-highlighted leading-snug">
+          {{ announcement.title }}
+        </h3>
+        <p v-if="announcement.content" class="text-sm sm:text-base text-default whitespace-pre-wrap leading-relaxed mt-1.5 max-w-3xl">
+          {{ announcement.content }}
+        </p>
       </div>
-      <PollResults :options="announcement.options" :total-votes="announcement.totalVotes" />
-    </div>
 
-    <!-- Ya votó -->
-    <div v-else-if="checkStatus === 'already_voted'" class="space-y-4 pt-2 border-t border-muted/30">
-      <div class="flex items-center justify-between bg-primary/10 text-primary p-3 rounded-xl border border-primary/20 text-xs sm:text-sm">
-        <div class="flex items-center gap-2">
-          <UIcon name="i-lucide-circle-check" class="size-5 text-primary shrink-0" />
-          <span>¡Ya registraste tu voto con <strong>{{ email }}</strong>!</span>
+      <!-- Votación finalizada -->
+      <div v-if="isClosed" class="space-y-3 pt-3 border-t border-[var(--atelier-border-muted)]">
+        <div class="flex items-center justify-between text-xs font-tech">
+          <span class="flex items-center gap-1.5 text-muted">
+            <UIcon name="i-lucide-lock" class="size-3.5" />
+            PLAZO FINALIZADO // RESULTADOS DEFINITIVOS
+          </span>
+          <span class="font-semibold text-highlighted">
+            {{ announcement.totalVotes ?? 0 }} {{ pluralVotes(announcement.totalVotes ?? 0, true).toUpperCase() }}
+          </span>
         </div>
-        <UButton size="xs" variant="ghost" color="neutral" label="Cambiar correo" @click="resetEmail" />
+        <PollResults :options="announcement.options" :total-votes="announcement.totalVotes" />
       </div>
 
-      <div class="flex items-center justify-between text-xs font-semibold text-muted pt-1">
-        <span>Resultados actuales:</span>
-        <span class="text-primary font-bold">
-          {{ announcement.totalVotes }} {{ pluralVotes(announcement.totalVotes, true) }}
-        </span>
+      <!-- Ya votó -->
+      <div v-else-if="checkStatus === 'already_voted'" class="space-y-4 pt-3 border-t border-[var(--atelier-border-muted)]">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-[6px] bg-[var(--atelier-lichen-soft)] border border-[var(--atelier-lichen-border)] text-xs sm:text-sm">
+          <div class="flex items-center gap-2 text-[var(--atelier-lichen)]">
+            <UIcon name="i-lucide-circle-check" class="size-4 shrink-0" />
+            <span>Voto registrado con el correo <strong class="font-tech">{{ email }}</strong></span>
+          </div>
+          <button
+            type="button"
+            class="self-end sm:self-auto min-h-[36px] px-2.5 rounded-[4px] border border-[var(--atelier-border)] bg-[var(--atelier-surface)] font-tech text-xs text-toned hover:text-highlighted transition-colors"
+            @click="resetEmail"
+          >
+            CAMBIAR CORREO
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between text-xs font-tech text-muted pt-1">
+          <span>CÓMPUTO PARCIAL EN CURSO</span>
+          <span class="text-highlighted font-semibold">
+            {{ announcement.totalVotes ?? 0 }} {{ pluralVotes(announcement.totalVotes ?? 0, true).toUpperCase() }}
+          </span>
+        </div>
+        <PollResults
+          :options="announcement.options"
+          :total-votes="announcement.totalVotes"
+          :voted-option-id="votedOptionId"
+        />
       </div>
-      <PollResults
+
+      <!-- Correo no autorizado -->
+      <div v-else-if="checkStatus === 'not_authorized'" class="space-y-3 pt-3 border-t border-[var(--atelier-border-muted)]">
+        <div class="p-3.5 rounded-[6px] bg-[var(--atelier-terracotta-soft)] border border-[var(--atelier-terracotta-border)] text-[var(--atelier-terracotta)] text-sm flex items-start gap-2.5">
+          <UIcon name="i-lucide-circle-alert" class="size-5 shrink-0 mt-0.5" />
+          <div class="space-y-1">
+            <p class="font-semibold">Correo no habilitado en el padrón de esta votación</p>
+            <p class="text-xs text-default">
+              La dirección <strong class="font-tech">{{ email }}</strong> no figura en la nómina autorizada de la asignatura.
+            </p>
+          </div>
+        </div>
+        <div class="flex justify-end">
+          <UButton size="sm" variant="soft" color="neutral" label="Intentar con otro correo" @click="resetEmail" />
+        </div>
+      </div>
+
+      <!-- Autorizado: elegir opción -->
+      <PollVoteForm
+        v-else-if="checkStatus === 'authorized'"
+        v-model:selected="selectedOptionId"
         :options="announcement.options"
-        :total-votes="announcement.totalVotes"
-        :voted-option-id="votedOptionId"
+        :email="email"
+        :voting="voting"
+        @submit="submitVote"
+        @reset="resetEmail"
+      />
+
+      <!-- Idle: pedir correo -->
+      <PollEmailForm
+        v-else
+        v-model:email="email"
+        :options="announcement.options"
+        :checking="checking"
+        :error-message="errorMessage"
+        @submit="verifyEmail"
       />
     </div>
-
-    <!-- Correo no autorizado -->
-    <div v-else-if="checkStatus === 'not_authorized'" class="space-y-3 pt-2 border-t border-muted/30">
-      <div class="bg-error/10 border border-error/20 text-error p-3.5 rounded-xl text-sm flex items-start gap-2.5">
-        <UIcon name="i-lucide-circle-alert" class="size-5 shrink-0 mt-0.5" />
-        <div class="space-y-1">
-          <p class="font-semibold">No autorizado para votar</p>
-          <p class="text-xs opacity-90">
-            El correo <strong>{{ email }}</strong> no figura en la lista de estudiantes autorizados para esta votación.
-          </p>
-        </div>
-      </div>
-      <div class="flex justify-end">
-        <UButton size="xs" variant="soft" color="neutral" label="Probar con otro correo" @click="resetEmail" />
-      </div>.
-    </div>
-
-    <!-- Autorizado: elegir opción -->
-    <PollVoteForm
-      v-else-if="checkStatus === 'authorized'"
-      v-model:selected="selectedOptionId"
-      :options="announcement.options"
-      :email="email"
-      :voting="voting"
-      @submit="submitVote"
-      @reset="resetEmail"
-    />
-
-    <!-- Idle: pedir correo -->
-    <PollEmailForm
-      v-else
-      v-model:email="email"
-      :options="announcement.options"
-      :checking="checking"
-      :error-message="errorMessage"
-      @submit="verifyEmail"
-    />
-  </UCard>
+  </TechnicalCard>
 </template>

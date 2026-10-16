@@ -8,16 +8,36 @@ export default defineEventHandler(async (event) => {
 
     // Admin sees all subjects
     if (ta.role === 'ADMIN') {
-      return await prisma.subject.findMany({ orderBy: { name: 'asc' } })
+      return await prisma.subject.findMany({
+        orderBy: { name: 'asc' },
+        include: {
+          users: { select: { name: true, id: true } },
+          _count: { select: { materials: true, announcements: true, sessions: true } },
+        },
+      })
     }
 
     // TA sees only assigned subjects
     const user = await prisma.user.findUnique({
       where: { id: ta.id },
-      include: { subjects: { orderBy: { name: 'asc' } } },
+      include: {
+        subjects: {
+          orderBy: { name: 'asc' },
+          include: {
+            users: { select: { name: true, id: true } },
+            _count: { select: { materials: true, announcements: true, sessions: true } },
+          },
+        },
+      },
     })
     return user?.subjects ?? []
   }
 
-  return await prisma.subject.findMany({ orderBy: { name: 'asc' }, include: { users: { select: { name: true, id: true } } } })
+  return await prisma.subject.findMany({
+    orderBy: { name: 'asc' },
+    include: {
+      users: { select: { name: true, id: true } },
+      _count: { select: { materials: true, announcements: true, sessions: true } },
+    },
+  })
 })

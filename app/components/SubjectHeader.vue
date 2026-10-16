@@ -1,74 +1,49 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import type { Subject } from '~/types/subjects'
 
-const props = defineProps<{
+defineProps<{
   subjectId: string
-  subject?: { id: string; name: string; code?: string | null } | null
+  subject?: Subject | null
   status: 'pending' | 'success' | 'error' | 'idle'
   isAdmin?: boolean
 }>()
-
-const links = computed(() => [
-  {
-    label: 'Anuncios',
-    icon: 'i-lucide-megaphone',
-    to: props.isAdmin ? `/admin/${props.subjectId}/announcements` : `/${props.subjectId}`,
-    exact: true,
-  },
-  {
-    label: 'Materiales',
-    icon: 'i-lucide-folder',
-    to: props.isAdmin ? `/admin/${props.subjectId}/materials` : `/${props.subjectId}/materials`,
-  },
-  {
-    label: 'Horario',
-    icon: 'i-lucide-calendar-days',
-    to: props.isAdmin ? `/admin/${props.subjectId}/schedule` : `/${props.subjectId}/schedule`,
-  },
-])
 </script>
 
 <template>
-  <header class="bg-elevated border-b border-muted sticky top-16 z-40">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-      <div class="flex items-center gap-4">
-        <UButton
-          :to="isAdmin ? '/admin' : '/'"
-          color="neutral"
-          variant="ghost"
-          icon="i-lucide-arrow-left"
-          :aria-label="isAdmin ? 'Volver al dashboard' : 'Volver al inicio'"
-        />
+  <!-- En vista pública renderiza el Bento Context Header con tarjetas-ficha -->
+  <BentoContextHeader
+    v-if="!isAdmin"
+    :subject-id="subjectId"
+    :subject="subject"
+    :status="status"
+  />
 
-        <div v-if="status === 'pending'" class="flex items-center gap-3">
-          <USkeleton class="h-6 w-32" />
-          <USkeleton class="h-5 w-16" />
-        </div>
-
-        <div v-else-if="subject" class="flex items-center gap-3">
-          <h1 class="text-xl font-bold text-highlighted truncate max-w-[220px] sm:max-w-md font-display">
-            {{ subject.name }}
-          </h1>
-          <UBadge color="neutral" variant="subtle" size="sm" class="hidden sm:inline-flex">
-            {{ subject.code }}
-          </UBadge>
-        </div>
+  <!-- En vista Admin renderiza una franja técnica compacta (las pestañas ya viven en la barra superior unificada) -->
+  <div
+    v-else
+    class="border-b border-[var(--atelier-border)] bg-[var(--atelier-surface-muted)]/40"
+  >
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <span class="atelier-tag px-2 py-0.5 rounded-[4px] bg-[var(--atelier-surface)] border border-[var(--atelier-border)] text-muted">
+          MODO EDICIÓN TA
+        </span>
+        <h1 v-if="subject" class="font-editorial text-xl font-medium text-highlighted truncate">
+          {{ subject.name }}
+        </h1>
+        <USkeleton v-else-if="status === 'pending'" class="h-6 w-48" />
       </div>
 
       <UButton
-        v-if="subject && isAdmin"
+        v-if="subject"
         :to="`/${subject.id}`"
         color="secondary"
         variant="soft"
-        size="sm"
-        icon="i-lucide-eye"
-        label="Ver público"
-        class="hidden sm:inline-flex"
+        size="xs"
+        icon="i-lucide-external-link"
+        label="Abrir ficha pública"
+        class="lg:hidden"
       />
     </div>
-
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <UNavigationMenu :items="links" class="border-b-0" />
-    </div>
-  </header>
+  </div>
 </template>

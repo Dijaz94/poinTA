@@ -3,35 +3,31 @@ import type { Announcement } from '~/types/announcements'
 
 defineProps<{
   announcement: Announcement
+  index?: string | number
 }>()
 </script>
 
 <template>
-  <UCard
-    :ui="{
-      root: 'border-l-4 border-l-primary',
-      header: 'pb-2 bg-muted/10',
-      body: 'pt-4',
-    }"
+  <TechnicalCard
+    :index="index"
+    eyebrow="COMUNICADO DOCENTE"
+    accent="cobalt"
   >
-    <template #header>
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <UBadge color="neutral" variant="subtle" size="xs">
-            <UIcon name="i-lucide-megaphone" class="size-3 mr-1" />
-            Comunicado
-          </UBadge>
-          <h3 class="font-bold text-lg text-default">{{ announcement.title }}</h3>
-        </div>
-        <div class="flex items-center gap-1.5 text-xs text-muted whitespace-nowrap">
-          <UIcon name="i-lucide-clock" class="size-3.5" />
-          {{ formatDateTime(announcement.createdAt) }}
-        </div>
-      </div>
+    <template #meta>
+      <span class="inline-flex items-center gap-1.5 font-tech text-xs text-muted">
+        <UIcon name="i-lucide-clock" class="size-3.5" />
+        {{ formatDateTime(announcement.createdAt) }}
+      </span>
     </template>
 
-    <p class="text-default whitespace-pre-wrap leading-relaxed">
-      {{ announcement.content }}
-    </p>
-  </UCard>
+    <div class="space-y-2.5">
+      <h3 class="font-editorial text-xl sm:text-2xl font-medium text-highlighted leading-snug">
+        {{ announcement.title }}
+      </h3>
+
+      <p class="text-sm sm:text-base text-default whitespace-pre-wrap leading-relaxed max-w-3xl">
+        {{ announcement.content }}
+      </p>
+    </div>
+  </TechnicalCard>
 </template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Announcement } from '~/types/announcements'
-import { isPollExpired } from '~/utils/poll';
+import { isPollExpired } from '~/utils/poll'
 
 defineProps<{
   announcement: Announcement
@@ -13,40 +13,31 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <UCard
-    :ui="{
-      root: announcement.type === 'POLL' ? 'border-l-4 border-l-indigo-500' : 'border-l-4 border-l-primary',
-    }"
+  <TechnicalCard
+    :eyebrow="announcement.type === 'POLL' ? 'VOTACIÓN PUBLICADA' : 'COMUNICADO PUBLICADO'"
+    :accent="announcement.type === 'POLL' ? 'terracotta' : 'cobalt'"
   >
+    <template #meta>
+      <div class="flex items-center gap-2">
+        <span
+          v-if="announcement.type === 'POLL' && announcement.deadline"
+          class="font-tech text-[11px] font-semibold px-1.5 py-0.5 rounded-[4px] border"
+          :class="isPollExpired(announcement.deadline)
+            ? 'bg-[var(--atelier-surface)] border-[var(--atelier-border)] text-muted'
+            : 'bg-[var(--atelier-terracotta-soft)] border-[var(--atelier-terracotta-border)] text-[var(--atelier-terracotta)]'"
+        >
+          {{ isPollExpired(announcement.deadline) ? 'CERRADA' : `CIERRA: ${formatDateTime(announcement.deadline)}` }}
+        </span>
+        <span class="font-tech text-xs text-muted">
+          {{ formatDateTime(announcement.createdAt) }}
+        </span>
+      </div>
+    </template>
+
     <div class="space-y-4">
       <div class="flex items-start justify-between gap-4">
         <div class="min-w-0 flex-1">
-          <div class="flex flex-wrap items-center gap-2 mb-1.5">
-            <UBadge
-              :color="announcement.type === 'POLL' ? 'primary' : 'neutral'"
-              variant="subtle"
-              size="xs"
-            >
-              <UIcon :name="announcement.type === 'POLL' ? 'i-lucide-chart-bar' : 'i-lucide-megaphone'" class="size-3 mr-1" />
-              {{ announcement.type === 'POLL' ? 'Votación' : 'Comunicado' }}
-            </UBadge>
-
-            <UBadge
-              v-if="announcement.type === 'POLL' && announcement.deadline"
-              :color="isPollExpired(announcement.deadline) ? 'error' : 'warning'"
-              variant="soft"
-              size="xs"
-            >
-              <UIcon name="i-lucide-clock" class="size-3 mr-1" />
-              {{ isPollExpired(announcement.deadline) ? 'Votación Cerrada' : `Cierra: ${formatDateTime(announcement.deadline)}` }}
-            </UBadge>
-
-            <span class="text-xs text-muted whitespace-nowrap">
-              {{ formatDateTime(announcement.createdAt) }}
-            </span>
-          </div>
-
-          <h3 class="font-bold text-lg text-default">{{ announcement.title }}</h3>
+          <h3 class="font-editorial text-xl font-medium text-highlighted">{{ announcement.title }}</h3>
           <p v-if="announcement.content" class="text-default text-sm whitespace-pre-wrap leading-relaxed mt-1">
             {{ announcement.content }}
           </p>
@@ -57,23 +48,26 @@ const emit = defineEmits<{
           variant="soft"
           icon="i-lucide-trash"
           size="sm"
+          class="min-h-[38px]"
           :loading="deleting"
           aria-label="Eliminar publicación"
           @click="emit('delete', announcement.id)"
         />
       </div>
 
-      <!-- Resultados en tiempo real de la votación (solo para POLL) -->
-      <div v-if="announcement.type === 'POLL' && announcement.options?.length" class="space-y-3 pt-3 border-t border-muted/30">
-        <div class="flex items-center justify-between text-xs font-semibold text-muted">
-          <span>Resultados de la votación</span>
-          <span class="text-primary font-bold">
-            {{ announcement.totalVotes ?? 0 }} {{ (announcement.totalVotes ?? 0) === 1 ? 'voto total' : 'votos totales' }}
+      <div
+        v-if="announcement.type === 'POLL' && announcement.options?.length"
+        class="space-y-3 pt-3 border-t border-[var(--atelier-border-muted)]"
+      >
+        <div class="flex items-center justify-between text-xs font-tech text-muted">
+          <span>CÓMPUTO DE VOTOS EN TIEMPO REAL</span>
+          <span class="text-highlighted font-semibold">
+            {{ announcement.totalVotes ?? 0 }} {{ (announcement.totalVotes ?? 0) === 1 ? 'VOTO TOTAL' : 'VOTOS TOTALES' }}
           </span>
         </div>
 
         <PollResults :options="announcement.options" :total-votes="announcement.totalVotes" size="sm" />
       </div>
     </div>
-  </UCard>
+  </TechnicalCard>
 </template>

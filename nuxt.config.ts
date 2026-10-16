@@ -19,9 +19,15 @@ export default defineNuxtConfig({
   },
   css: ['~/assets/css/main.css'],
   fonts: {
+    defaults: {
+      weights: [400, 500, 600],
+      styles: ['normal', 'italic'],
+      subsets: ['latin', 'latin-ext'],
+    },
     families: [
-      { name: 'Inter', weights: [400, 500, 600, 700] },
-      { name: 'Space Grotesk', weights: [400, 500, 600, 700] },
+      { name: 'Newsreader', weights: [400, 500, 600], styles: ['normal', 'italic'], display: 'swap' },
+      { name: 'Inter', weights: [400, 500, 600, 700], styles: ['normal'], display: 'swap' },
+      { name: 'IBM Plex Mono', weights: [400, 500, 600], styles: ['normal'], display: 'swap' },
     ],
   },
   vite: {
