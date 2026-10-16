@@ -183,12 +183,12 @@ const toggleColorMode = () => {
 
     <!-- Pie de Página Editorial Técnico -->
     <footer class="border-t border-[var(--atelier-border)] bg-[var(--atelier-surface)] mt-auto">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-tech text-muted">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-tech text-muted text-left">
         <div class="flex items-center gap-2">
-          <span class="inline-block size-2 rounded-full bg-[var(--atelier-lichen-solid)]" aria-hidden="true" />
+          <span class="inline-block size-1.5 rounded-full bg-[var(--atelier-text-muted)]" aria-hidden="true" />
           <span>POINTA // PLATAFORMA DE AYUDANTÍAS UNIVERSITARIAS · EDICIÓN 2026</span>
         </div>
-        <p class="text-center sm:text-right">
+        <p class="text-left sm:text-right">
           &copy; Desarrollado por <span class="text-highlighted font-medium">Diego Álvarez Aravena</span>
         </p>
       </div>

@@ -41,7 +41,7 @@ const resourceMeta = computed(() => {
     interactive
   >
     <template #meta>
-      <span class="font-tech text-[11px] font-semibold px-1.5 py-0.5 rounded-[4px] bg-[var(--atelier-lichen-soft)] text-[var(--atelier-lichen)] border border-[var(--atelier-lichen-border)]">
+      <span class="font-tech text-[11px] font-semibold px-1.5 py-0.5 rounded-[4px] bg-[var(--atelier-surface)] text-toned border border-[var(--atelier-border)]">
         {{ resourceMeta.tag }}
       </span>
     </template>
@@ -51,7 +51,7 @@ const resourceMeta = computed(() => {
         <div class="flex items-start gap-2.5">
           <UIcon
             :name="resourceMeta.icon"
-            class="size-4 text-[var(--atelier-lichen)] shrink-0 mt-1"
+            class="size-4 text-muted shrink-0 mt-1"
           />
           <h4 class="font-editorial text-lg font-medium text-highlighted leading-snug line-clamp-2">
             {{ material.title }}

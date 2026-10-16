@@ -189,21 +189,27 @@ function formatCardIndex(sectionCode: string, idx: number): string {
 
 <template>
   <div class="space-y-6">
-    <!-- Cabecera de Sección + Filtro Rápido de Recursos -->
+    <!-- Cabecera de Sección Two-Tone + Filtro Rápido de Recursos -->
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[var(--atelier-border)]">
-      <div>
-        <span class="atelier-tag text-muted block mb-1">
-          SECCIÓN 02 // REPOSITORIO POR UNIDADES
+      <div class="max-w-2xl">
+        <span class="atelier-tag text-muted block mb-1.5">
+          02 // REPOSITORIO POR UNIDADES
         </span>
-        <h2 class="font-editorial text-2xl sm:text-3xl font-medium text-highlighted">
-          Material de <span class="italic font-normal text-[var(--atelier-cobalt)]">estudio</span>
+        <h2 class="font-editorial text-2xl sm:text-3xl font-medium tracking-tight leading-snug text-left">
+          <span class="text-highlighted">
+            Material de <span class="italic font-normal text-[var(--atelier-cobalt)]">estudio</span>.
+          </span>
+          {{ ' ' }}
+          <span class="text-muted font-normal text-lg sm:text-xl">
+            Guías, código fuente y recursos organizados por unidad.
+          </span>
         </h2>
       </div>
 
       <!-- Buscador Local de Materiales -->
-      <div v-if="materials && materials.length > 0" class="w-full sm:w-72">
+      <div v-if="materials && materials.length > 0" class="w-full sm:w-72 shrink-0">
         <label for="material-filter-input" class="sr-only">Filtrar materiales por título o descripción</label>
-        <div class="relative flex items-center rounded-[6px] border border-[var(--atelier-border)] bg-[var(--atelier-surface)] focus-within:border-[var(--atelier-cobalt)] focus-within:ring-2 focus-within:ring-[var(--atelier-cobalt)]/20 transition-all">
+        <div class="relative flex items-center rounded-[6px] border border-[var(--atelier-border-strong)] bg-[var(--atelier-surface)] focus-within:border-[var(--atelier-cobalt)] focus-within:ring-2 focus-within:ring-[var(--atelier-cobalt)]/15 transition-all">
           <UIcon name="i-lucide-search" class="size-4 text-muted ml-3 shrink-0 pointer-events-none" />
           <input
             id="material-filter-input"
@@ -219,7 +225,7 @@ function formatCardIndex(sectionCode: string, idx: number): string {
           <button
             v-if="searchQuery"
             type="button"
-            class="inline-flex items-center justify-center size-8 mr-1 rounded-[4px] text-muted hover:text-highlighted hover:bg-[var(--atelier-surface-muted)]"
+            class="inline-flex items-center justify-center size-8 mr-1 rounded-[4px] text-muted hover:text-highlighted hover:bg-[var(--atelier-surface-muted)] cursor-pointer"
             aria-label="Limpiar filtro"
             @mousedown.prevent
             @click="searchQuery = ''"
@@ -274,13 +280,13 @@ function formatCardIndex(sectionCode: string, idx: number): string {
       <div class="lg:hidden mb-6">
         <button
           type="button"
-          class="w-full min-h-[46px] px-3.5 py-2.5 rounded-[8px] border border-[var(--atelier-border)] bg-[var(--atelier-surface)] shadow-[var(--atelier-shadow-rest)] flex items-center justify-between gap-2 text-left"
+          class="w-full min-h-[46px] px-3.5 py-2.5 rounded-[8px] border border-[var(--atelier-border)] bg-[var(--atelier-surface)] shadow-[var(--atelier-shadow-rest)] flex items-center justify-between gap-2 text-left cursor-pointer"
           :aria-expanded="mobileTreeOpen"
           aria-controls="mobile-unit-tree"
           @click="mobileTreeOpen = !mobileTreeOpen"
         >
           <div class="flex items-center gap-2 min-w-0">
-            <span class="font-tech text-[11px] font-semibold px-1.5 py-0.5 rounded-[4px] bg-[var(--atelier-cobalt-soft)] text-[var(--atelier-cobalt)]">
+            <span class="font-tech text-[11px] font-semibold px-1.5 py-0.5 rounded-[4px] bg-[var(--atelier-surface-muted)] text-highlighted border border-[var(--atelier-border)]">
               {{ currentActiveSection?.code ?? '01' }}
             </span>
             <span class="text-xs font-tech text-muted uppercase shrink-0">UNIDAD:</span>
@@ -305,12 +311,12 @@ function formatCardIndex(sectionCode: string, idx: number): string {
             v-for="sec in groupedSections"
             :key="`mob-nav-${sec.id}`"
             type="button"
-            class="w-full min-h-[44px] px-3 py-2 rounded-[6px] flex items-center justify-between gap-2 text-left text-xs transition-colors"
+            class="w-full min-h-[44px] px-3 py-2 rounded-[6px] flex items-center justify-between gap-2 text-left text-xs transition-colors cursor-pointer"
             :class="[
               sec.isSubUnit ? 'pl-7' : '',
               activeSectionId === sec.id
-                ? 'bg-[var(--atelier-cobalt-soft)] text-[var(--atelier-cobalt)] font-semibold'
-                : 'text-toned hover:bg-[var(--atelier-surface-muted)]/60',
+                ? 'bg-[var(--atelier-text-high)] text-[var(--atelier-surface)] font-semibold'
+                : 'text-toned hover:bg-[var(--atelier-surface-muted)]',
             ]"
             @click="scrollToSection(sec.id)"
           >
@@ -318,7 +324,7 @@ function formatCardIndex(sectionCode: string, idx: number): string {
               <span class="font-tech text-[11px] opacity-80 shrink-0">{{ sec.code }}</span>
               <span class="truncate">{{ sec.title }}</span>
             </div>
-            <span class="font-tech text-[11px] text-muted shrink-0">
+            <span class="font-tech text-[11px] opacity-75 shrink-0">
               {{ sec.materials.length }}
             </span>
           </button>
@@ -340,11 +346,11 @@ function formatCardIndex(sectionCode: string, idx: number): string {
             v-for="sec in groupedSections"
             :key="`desk-nav-${sec.id}`"
             type="button"
-            class="relative w-full min-h-[40px] px-2.5 py-1.5 rounded-[6px] flex items-center justify-between gap-2 text-left text-xs transition-colors group"
+            class="relative w-full min-h-[38px] px-2.5 py-1.5 rounded-[5px] flex items-center justify-between gap-2 text-left text-xs transition-colors group cursor-pointer"
             :class="[
               sec.isSubUnit ? 'pl-5' : '',
               activeSectionId === sec.id
-                ? 'bg-[var(--atelier-cobalt-soft)] text-[var(--atelier-cobalt)] font-semibold'
+                ? 'bg-[var(--atelier-surface-muted)] text-highlighted font-semibold'
                 : 'text-toned hover:text-highlighted hover:bg-[var(--atelier-surface-muted)]/50',
             ]"
             @click="scrollToSection(sec.id)"
@@ -357,14 +363,14 @@ function formatCardIndex(sectionCode: string, idx: number): string {
             />
 
             <div class="flex items-center gap-2 min-w-0">
-              <span class="font-tech text-[11px] opacity-80 shrink-0">{{ sec.code }}</span>
+              <span class="font-tech text-[11px] text-muted shrink-0">{{ sec.code }}</span>
               <span class="truncate">{{ sec.title }}</span>
             </div>
 
             <span
               class="font-tech text-[10px] px-1.5 py-0.5 rounded-[4px] border shrink-0"
               :class="activeSectionId === sec.id
-                ? 'border-[var(--atelier-cobalt-border)] bg-[var(--atelier-surface)] text-[var(--atelier-cobalt)]'
+                ? 'border-[var(--atelier-border-strong)] bg-[var(--atelier-surface)] text-highlighted'
                 : 'border-[var(--atelier-border-muted)] bg-[var(--atelier-surface-muted)]/50 text-muted'"
             >
               {{ sec.materials.length }}
@@ -382,21 +388,18 @@ function formatCardIndex(sectionCode: string, idx: number): string {
           :data-section-id="section.id"
           class="scroll-mt-28 space-y-4"
         >
-          <!-- Encabezado de Unidad con Numeración Index Spine -->
+          <!-- Encabezado de Unidad con Numeración Técnica Monocroma -->
           <div class="flex items-end justify-between gap-3 pb-2.5 border-b border-[var(--atelier-border)]">
             <div class="flex items-center gap-3 min-w-0">
               <span
-                class="inline-flex items-center justify-center px-2 py-1 rounded-[5px] font-tech text-xs font-semibold border shrink-0"
-                :class="section.isSubUnit
-                  ? 'bg-[var(--atelier-lichen-soft)] border-[var(--atelier-lichen-border)] text-[var(--atelier-lichen)]'
-                  : 'bg-[var(--atelier-cobalt-soft)] border-[var(--atelier-cobalt-border)] text-[var(--atelier-cobalt)]'"
+                class="inline-flex items-center justify-center px-2 py-1 rounded-[5px] font-tech text-xs font-semibold border border-[var(--atelier-border)] bg-[var(--atelier-surface-muted)] text-highlighted shrink-0"
               >
                 {{ section.code }}
               </span>
 
               <div class="min-w-0">
                 <div v-if="section.parentTitle" class="font-tech text-[11px] text-muted uppercase truncate">
-                  {{ section.parentTitle }} / SUB-UNIDAD
+                  {{ section.parentTitle }} // SUB-UNIDAD
                 </div>
                 <h3 class="font-editorial text-xl sm:text-2xl font-medium text-highlighted truncate">
                   {{ section.title }}

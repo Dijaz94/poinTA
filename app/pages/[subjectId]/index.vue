@@ -36,64 +36,75 @@ function formatIndex(idx: number): string {
 
 <template>
   <div class="space-y-6">
-    <!-- Cabecera de Sección con Filtro de Registro -->
+    <!-- Cabecera de Sección con Jerarquía Two-Tone + Filtro Escandinavo -->
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[var(--atelier-border)]">
-      <div>
-        <span class="atelier-tag text-muted block mb-1">
-          SECCIÓN 01 // BITÁCORA Y CONSULTAS
+      <div class="max-w-2xl">
+        <span class="atelier-tag text-muted block mb-1.5">
+          01 // BITÁCORA Y CONSULTAS
         </span>
-        <h2 class="font-editorial text-2xl sm:text-3xl font-medium text-highlighted">
-          Anuncios y <span class="italic font-normal text-[var(--atelier-cobalt)]">votaciones</span>
+        <h2 class="font-editorial text-2xl sm:text-3xl font-medium tracking-tight leading-snug text-left">
+          <span class="text-highlighted">
+            Anuncios y <span class="italic font-normal text-[var(--atelier-cobalt)]">votaciones</span>.
+          </span>
+          {{ ' ' }}
+          <span class="text-muted font-normal text-lg sm:text-xl">
+            Comunicados oficiales y encuestas del equipo docente.
+          </span>
         </h2>
       </div>
 
-      <!-- Selector de Filtro Técnico (Áreas táctiles >= 44px) -->
+      <!-- Selector de Filtro Técnico (Tinta de alto contraste coherente con Command Ledger) -->
       <div
         v-if="announcements && announcements.length > 0"
         role="tablist"
         aria-label="Filtrar publicaciones"
-        class="inline-flex items-center p-1 rounded-[8px] border border-[var(--atelier-border)] bg-[var(--atelier-surface)] self-start sm:self-auto"
+        class="inline-flex items-center gap-1 p-1 rounded-[8px] border border-[var(--atelier-border)] bg-[var(--atelier-surface)] self-start sm:self-auto shrink-0"
       >
         <button
           type="button"
           role="tab"
           :aria-selected="activeFilter === 'ALL'"
-          class="inline-flex items-center gap-1.5 px-3 min-h-[38px] rounded-[6px] font-tech text-xs transition-colors"
+          class="inline-flex items-center gap-1.5 px-3 min-h-[36px] rounded-[5px] font-tech text-xs transition-colors cursor-pointer"
           :class="activeFilter === 'ALL'
-            ? 'bg-[var(--atelier-cobalt)] text-white font-semibold'
-            : 'text-toned hover:text-highlighted'"
+            ? 'bg-[var(--atelier-text-high)] text-[var(--atelier-surface)] font-semibold'
+            : 'text-muted hover:text-highlighted hover:bg-[var(--atelier-surface-muted)]'"
           @click="activeFilter = 'ALL'"
         >
           <span>TODOS</span>
-          <span class="opacity-80">({{ counts.all }})</span>
+          <span class="opacity-75">({{ counts.all }})</span>
         </button>
 
         <button
           type="button"
           role="tab"
           :aria-selected="activeFilter === 'COMMUNICATION'"
-          class="inline-flex items-center gap-1.5 px-3 min-h-[38px] rounded-[6px] font-tech text-xs transition-colors"
+          class="inline-flex items-center gap-1.5 px-3 min-h-[36px] rounded-[5px] font-tech text-xs transition-colors cursor-pointer"
           :class="activeFilter === 'COMMUNICATION'
-            ? 'bg-[var(--atelier-cobalt)] text-white font-semibold'
-            : 'text-toned hover:text-highlighted'"
+            ? 'bg-[var(--atelier-text-high)] text-[var(--atelier-surface)] font-semibold'
+            : 'text-muted hover:text-highlighted hover:bg-[var(--atelier-surface-muted)]'"
           @click="activeFilter = 'COMMUNICATION'"
         >
           <span>AVISOS</span>
-          <span class="opacity-80">({{ counts.communication }})</span>
+          <span class="opacity-75">({{ counts.communication }})</span>
         </button>
 
         <button
           type="button"
           role="tab"
           :aria-selected="activeFilter === 'POLL'"
-          class="inline-flex items-center gap-1.5 px-3 min-h-[38px] rounded-[6px] font-tech text-xs transition-colors"
+          class="inline-flex items-center gap-1.5 px-3 min-h-[36px] rounded-[5px] font-tech text-xs transition-colors cursor-pointer"
           :class="activeFilter === 'POLL'
             ? 'bg-[var(--atelier-terracotta-solid)] text-white font-semibold'
-            : 'text-toned hover:text-highlighted'"
+            : 'text-muted hover:text-highlighted hover:bg-[var(--atelier-surface-muted)]'"
           @click="activeFilter = 'POLL'"
         >
+          <span
+            v-if="counts.poll > 0 && activeFilter !== 'POLL'"
+            class="size-1.5 rounded-full bg-[var(--atelier-terracotta)]"
+            aria-hidden="true"
+          />
           <span>VOTACIONES</span>
-          <span class="opacity-80">({{ counts.poll }})</span>
+          <span class="opacity-75">({{ counts.poll }})</span>
         </button>
       </div>
     </div>

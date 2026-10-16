@@ -45,13 +45,7 @@ const textSizeClasses = {
         />
         <path
           d="M13 9H18.5C21.5376 9 24 11.4624 24 14.5C24 17.5376 21.5376 20 18.5 20H16.5V25H13V9ZM16.5 12.5V16.5H18.5C19.6046 16.5 20.5 15.6046 20.5 14.5C20.5 13.3954 19.6046 12.5 18.5 12.5H16.5Z"
-          fill="#FCFBF7"
-        />
-        <circle
-          cx="18"
-          cy="32.5"
-          r="2.5"
-          class="fill-[var(--atelier-lichen-solid)]"
+          class="fill-[var(--atelier-surface)]"
         />
       </svg>
     </div>

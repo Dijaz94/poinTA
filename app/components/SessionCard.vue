@@ -62,7 +62,7 @@ const handleDownloadIcs = () => {
 
       <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-tech text-toned min-w-0">
         <span class="inline-flex items-center gap-1.5 font-semibold text-highlighted shrink-0">
-          <UIcon name="i-lucide-clock" class="size-3.5 text-[var(--atelier-terracotta)]" />
+          <UIcon name="i-lucide-clock" class="size-3.5 text-muted" />
           {{ session.startTime }} – {{ session.endTime }}
         </span>
         <span
@@ -70,7 +70,7 @@ const handleDownloadIcs = () => {
           class="flex items-center gap-1.5 min-w-0 max-w-full"
           :title="session.location"
         >
-          <UIcon name="i-lucide-map-pin" class="size-3.5 text-[var(--atelier-lichen)] shrink-0" />
+          <UIcon name="i-lucide-map-pin" class="size-3.5 text-muted shrink-0" />
           <span class="truncate">{{ session.location }}</span>
         </span>
       </div>
@@ -102,7 +102,7 @@ const handleDownloadIcs = () => {
     <div v-else class="flex items-center gap-2 shrink-0 self-start sm:self-center">
       <button
         type="button"
-        class="inline-flex items-center gap-1.5 px-3 min-h-[44px] rounded-[6px] border border-[var(--atelier-border)] bg-[var(--atelier-surface)] hover:border-[var(--atelier-cobalt)] hover:text-[var(--atelier-cobalt)] font-tech text-xs font-medium text-toned transition-colors"
+        class="inline-flex items-center gap-1.5 px-3 min-h-[44px] rounded-[6px] border border-[var(--atelier-border)] bg-[var(--atelier-surface)] hover:border-[var(--atelier-cobalt)] hover:text-[var(--atelier-cobalt)] font-tech text-xs font-medium text-toned transition-colors cursor-pointer"
         title="Descargar archivo .ics para tu calendario"
         @click="handleDownloadIcs"
       >
@@ -127,14 +127,14 @@ const handleDownloadIcs = () => {
   <article
     v-else
     :data-id="session.id"
-    class="atelier-card border-t-2 border-t-[var(--atelier-cobalt)] p-3 flex flex-col justify-between gap-2.5 min-w-0 overflow-hidden"
+    class="rounded-[6px] border border-[var(--atelier-border)] border-l-2 border-l-[var(--atelier-cobalt)] bg-[var(--atelier-surface)] p-3 flex flex-col justify-between gap-2.5 min-w-0 overflow-hidden"
     :class="isAdmin ? 'cursor-grab active:cursor-grabbing' : ''"
   >
     <div class="space-y-1.5 min-w-0">
       <!-- Rango horario en monoespaciado -->
       <div class="flex items-center justify-between gap-1 min-w-0">
-        <span class="inline-flex items-center gap-1 font-tech text-xs font-semibold text-[var(--atelier-cobalt)] truncate">
-          <UIcon name="i-lucide-clock" class="size-3 shrink-0" />
+        <span class="inline-flex items-center gap-1 font-tech text-xs font-semibold text-highlighted truncate">
+          <UIcon name="i-lucide-clock" class="size-3 text-muted shrink-0" />
           <span class="truncate">{{ session.startTime }} – {{ session.endTime }}</span>
         </span>
 
@@ -167,10 +167,10 @@ const handleDownloadIcs = () => {
       <!-- Sala / Ubicación con tres puntos (…) -->
       <div
         v-if="session.location"
-        class="flex items-center gap-1 min-w-0 max-w-full font-tech text-[11px] text-toned"
+        class="flex items-center gap-1 min-w-0 max-w-full font-tech text-[11px] text-muted"
         :title="session.location"
       >
-        <UIcon name="i-lucide-map-pin" class="size-3 text-[var(--atelier-lichen)] shrink-0" />
+        <UIcon name="i-lucide-map-pin" class="size-3 text-muted shrink-0" />
         <span class="truncate block min-w-0">{{ session.location }}</span>
       </div>
     </div>

@@ -356,7 +356,7 @@ function formatIndex(idx: number): string {
 
                 <!-- Ayudantes en monoespaciado -->
                 <div class="mt-3 flex items-start gap-2 text-xs font-tech text-muted">
-                  <UIcon name="i-lucide-users" class="size-3.5 shrink-0 mt-0.5 text-[var(--atelier-lichen)]" />
+                  <UIcon name="i-lucide-users" class="size-3.5 shrink-0 mt-0.5 text-muted" />
                   <span v-if="subject.users?.length" class="line-clamp-2">
                     {{ subject.users.map(u => u.name).join(' · ') }}
                   </span>

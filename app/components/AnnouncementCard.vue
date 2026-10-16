@@ -11,7 +11,7 @@ defineProps<{
   <TechnicalCard
     :index="index"
     eyebrow="COMUNICADO DOCENTE"
-    accent="cobalt"
+    accent="none"
   >
     <template #meta>
       <span class="inline-flex items-center gap-1.5 font-tech text-xs text-muted">

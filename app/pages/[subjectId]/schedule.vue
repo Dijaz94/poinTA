@@ -162,18 +162,24 @@ function formatIndex(idx: number): string {
 
 <template>
   <div class="space-y-10">
-    <!-- Cabecera de Sección -->
+    <!-- Cabecera de Sección Two-Tone -->
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[var(--atelier-border)]">
-      <div>
-        <span class="atelier-tag text-muted block mb-1">
-          SECCIÓN 03 // CRONOGRAMA DE SESIONES
+      <div class="max-w-2xl">
+        <span class="atelier-tag text-muted block mb-1.5">
+          03 // CRONOGRAMA DE SESIONES
         </span>
-        <h2 class="font-editorial text-2xl sm:text-3xl font-medium text-highlighted">
-          Cinta <span class="italic font-normal text-[var(--atelier-cobalt)]">horaria</span> semanal
+        <h2 class="font-editorial text-2xl sm:text-3xl font-medium tracking-tight leading-snug text-left">
+          <span class="text-highlighted">
+            Cinta <span class="italic font-normal text-[var(--atelier-cobalt)]">horaria</span> semanal.
+          </span>
+          {{ ' ' }}
+          <span class="text-muted font-normal text-lg sm:text-xl">
+            Bloques regulares de ayudantía y exportación directa a tu calendario.
+          </span>
         </h2>
       </div>
 
-      <div class="flex items-center gap-3 font-tech text-xs text-muted">
+      <div class="flex items-center gap-3 font-tech text-xs text-muted shrink-0">
         <span class="inline-flex items-center gap-1.5">
           <span class="size-2 rounded-full bg-[var(--atelier-cobalt)]" aria-hidden="true" />
           DÍA ACTUAL EXPANDIDO
@@ -221,9 +227,9 @@ function formatIndex(idx: number): string {
             type="button"
             role="tab"
             :aria-selected="activeMobileDay === d.value"
-            class="relative flex flex-col items-center justify-center min-h-[48px] rounded-[6px] font-tech text-[11px] transition-colors"
+            class="relative flex flex-col items-center justify-center min-h-[48px] rounded-[6px] font-tech text-[11px] transition-colors cursor-pointer"
             :class="activeMobileDay === d.value
-              ? 'bg-[var(--atelier-cobalt)] text-white font-semibold'
+              ? 'bg-[var(--atelier-text-high)] text-[var(--atelier-surface)] font-semibold'
               : (d.value === todayEnum
                 ? 'bg-[var(--atelier-cobalt-soft)] text-[var(--atelier-cobalt)] font-semibold'
                 : 'text-toned hover:text-highlighted')"
@@ -234,7 +240,7 @@ function formatIndex(idx: number): string {
             <span
               v-if="(columns[d.value]?.length ?? 0) > 0"
               class="mt-1 size-1.5 rounded-full"
-              :class="activeMobileDay === d.value ? 'bg-white' : 'bg-[var(--atelier-lichen-solid)]'"
+              :class="activeMobileDay === d.value ? 'bg-[var(--atelier-surface)]' : 'bg-[var(--atelier-cobalt)]'"
               aria-hidden="true"
             />
           </button>
@@ -242,7 +248,7 @@ function formatIndex(idx: number): string {
 
         <!-- Panel del Día Activo con Soporte Swipe Horizontal -->
         <div
-          class="atelier-card overflow-hidden"
+          class="rounded-[8px] border border-[var(--atelier-border)] bg-[var(--atelier-surface)] overflow-hidden"
           @touchstart.passive="onTouchStart"
           @touchend.passive="onTouchEnd"
         >
@@ -250,7 +256,7 @@ function formatIndex(idx: number): string {
           <div class="px-4 py-3 border-b border-[var(--atelier-border)] bg-[var(--atelier-surface-muted)]/50 flex items-center justify-between gap-2">
             <button
               type="button"
-              class="inline-flex items-center justify-center min-w-[44px] min-h-[44px] -my-1.5 -ml-2 rounded-[6px] text-toned hover:text-highlighted hover:bg-[var(--atelier-surface)] transition-colors"
+              class="inline-flex items-center justify-center min-w-[44px] min-h-[44px] -my-1.5 -ml-2 rounded-[6px] text-toned hover:text-highlighted hover:bg-[var(--atelier-surface)] transition-colors cursor-pointer"
               aria-label="Día anterior"
               @click="stepMobileDay(-1)"
             >
@@ -264,7 +270,7 @@ function formatIndex(idx: number): string {
                 </h3>
                 <span
                   v-if="activeMobileDayObj.value === todayEnum"
-                  class="font-tech text-[10px] font-semibold px-1.5 py-0.5 rounded-[4px] bg-[var(--atelier-cobalt)] text-white"
+                  class="font-tech text-[10px] font-semibold px-1.5 py-0.5 rounded-[4px] bg-[var(--atelier-cobalt-soft)] text-[var(--atelier-cobalt)] border border-[var(--atelier-cobalt-border)]"
                 >
                   HOY
                 </span>
@@ -276,7 +282,7 @@ function formatIndex(idx: number): string {
 
             <button
               type="button"
-              class="inline-flex items-center justify-center min-w-[44px] min-h-[44px] -my-1.5 -mr-2 rounded-[6px] text-toned hover:text-highlighted hover:bg-[var(--atelier-surface)] transition-colors"
+              class="inline-flex items-center justify-center min-w-[44px] min-h-[44px] -my-1.5 -mr-2 rounded-[6px] text-toned hover:text-highlighted hover:bg-[var(--atelier-surface)] transition-colors cursor-pointer"
               aria-label="Día siguiente"
               @click="stepMobileDay(1)"
             >
@@ -306,30 +312,30 @@ function formatIndex(idx: number): string {
       </div>
 
       <!-- ===============================================================
-           VISTA DESKTOP (>= lg): Cinta Horaria Proporcional
+           VISTA DESKTOP (>= lg): Matriz Horaria Continua (1px shared hairlines)
            =============================================================== -->
       <div
-        class="hidden lg:grid gap-3 items-stretch"
+        class="hidden lg:grid items-stretch rounded-[8px] border border-[var(--atelier-border)] bg-[var(--atelier-surface)] divide-x divide-[var(--atelier-border)] overflow-hidden"
         :style="desktopGridStyle"
       >
         <div
           v-for="col in desktopColumns"
           :key="col.key"
-          class="min-w-0 min-h-[240px] rounded-[8px] border flex flex-col overflow-hidden transition-colors"
+          class="min-w-0 min-h-[250px] flex flex-col overflow-hidden transition-colors"
           :class="[
             col.isToday
-              ? 'border-[var(--atelier-cobalt)] bg-[var(--atelier-cobalt-soft)]/25 shadow-[var(--atelier-shadow-cobalt)]'
+              ? 'bg-[var(--atelier-cobalt-soft)]/20'
               : (col.isCollapsedWeekend
-                ? 'border-dashed border-[var(--atelier-border)] bg-[var(--atelier-surface-muted)]/25 opacity-80'
-                : 'border-[var(--atelier-border)] bg-[var(--atelier-surface)]'),
+                ? 'bg-[var(--atelier-surface-muted)]/35'
+                : 'bg-[var(--atelier-surface)]'),
           ]"
         >
           <!-- Cabecera de Columna de Día -->
           <div
-            class="px-3 py-2.5 border-b flex items-center justify-between gap-1.5 min-w-0"
+            class="px-3.5 py-2.5 border-b border-[var(--atelier-border)] flex items-center justify-between gap-1.5 min-w-0"
             :class="col.isToday
-              ? 'bg-[var(--atelier-cobalt)] text-white border-[var(--atelier-cobalt)]'
-              : 'bg-[var(--atelier-surface-muted)]/55 border-[var(--atelier-border-muted)] text-highlighted'"
+              ? 'bg-[var(--atelier-cobalt-soft)]/65 text-highlighted'
+              : 'bg-[var(--atelier-surface-muted)]/50 text-highlighted'"
           >
             <span class="font-tech text-xs font-semibold uppercase tracking-wider truncate">
               {{ col.label }}
@@ -337,7 +343,7 @@ function formatIndex(idx: number): string {
 
             <span
               v-if="col.isToday"
-              class="font-tech text-[10px] font-bold px-1.5 py-0.5 rounded-[3px] bg-white/20 text-white shrink-0"
+              class="font-tech text-[10px] font-semibold px-1.5 py-0.5 rounded-[3px] bg-[var(--atelier-cobalt)] text-white shrink-0"
             >
               HOY
             </span>
@@ -345,7 +351,7 @@ function formatIndex(idx: number): string {
               v-else-if="col.sessions.length > 0"
               class="font-tech text-[10px] text-muted shrink-0"
             >
-              {{ col.sessions.length }}
+              {{ String(col.sessions.length).padStart(2, '0') }}
             </span>
           </div>
 
@@ -370,7 +376,7 @@ function formatIndex(idx: number): string {
             </template>
 
             <div v-else class="flex-1 flex items-center justify-center">
-              <span class="font-tech text-[11px] text-muted/60 select-none">—</span>
+              <span class="font-tech text-[11px] text-muted/50 select-none">—</span>
             </div>
           </div>
         </div>
